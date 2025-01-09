@@ -47,7 +47,7 @@ FarmersHub/
 1. **Repository klonen**:
    ```bash
    git clone <repository-url>
-   cd FarmersHub/backend
+   cd FarmersHub/backend/backend
    ```
 
 2. **Virtuelle Umgebung erstellen und aktivieren**:
