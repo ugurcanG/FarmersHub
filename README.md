@@ -52,7 +52,7 @@ FarmersHub/
 
 2. **Virtuelle Umgebung erstellen und aktivieren**:
    ```bash
-   python3 -m venv venv
+   python3 -m venv venv # Windows: py -m venv venv
    source venv/bin/activate  # Windows: venv\Scripts\activate
    ```
 
