@@ -24,5 +24,7 @@ export default defineNuxtConfig({
     ],
   },
 
-  css: ["@/assets/css/tailwind.css"],
+  css: [
+    "quasar/dist/quasar.sass",
+  ],
 });

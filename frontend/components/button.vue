@@ -2,7 +2,7 @@
   <q-btn
     :label="label"
     :color="color"
-    class="rounded-md px-4 py-2 text-white font-semibold"
+    class="q-px-md q-py-sm text-white q-font-medium"
     @click="onClick"
   />
 </template>

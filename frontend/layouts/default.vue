@@ -1,14 +1,9 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <!-- Navbar (Global) -->
     <Navbar />
-
-    <!-- Seiteninhalt -->
     <q-page-container>
       <slot></slot>
     </q-page-container>
-
-    <!-- Footer -->
     <Footer />
   </q-layout>
 </template>
