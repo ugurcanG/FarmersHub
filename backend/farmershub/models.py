@@ -15,7 +15,6 @@ class Field(models.Model):
     saat = models.ForeignKey('Seed', models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'field'
 
 
@@ -24,10 +23,13 @@ class FieldMeasurement(models.Model):
     created_at = models.DateTimeField()
     row = models.BigIntegerField()
     column = models.BigIntegerField()
+    temperature = models.FloatField(blank=True, null=True)
+    humidity = models.FloatField(blank=True, null=True)
+    soil_moisture = models.FloatField(blank=True, null=True)
+    nutrients_level = models.FloatField(blank=True, null=True)
     field = models.ForeignKey(Field, models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'field_measurement'
 
 
@@ -38,18 +40,4 @@ class Seed(models.Model):
     mass_kg = models.FloatField()
 
     class Meta:
-        managed = False
         db_table = 'seed'
-
-
-class Weather(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    created_at = models.DateTimeField()
-    rain_mm = models.BigIntegerField()
-    time = models.DateTimeField()
-    sunny = models.BooleanField()
-    field = models.ForeignKey(Field, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'weather'
