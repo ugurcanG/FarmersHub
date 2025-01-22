@@ -1,6 +1,5 @@
 <template>
   <q-layout view="lHh Lpr lFf" class="bg-gray-100">
-    <Header></Header>
     <q-page-container>
       <div class="p-6 space-y-6">
         <h1 class="text-2xl font-bold text-center text-gray-800">
@@ -31,7 +30,6 @@
 </template>
 
 <script setup>
-import Header from "@/components/header.vue";
 import Footer from "@/components/footer.vue";
 import Card from "@/components/card.vue";
 import Button from "@/components/button.vue";

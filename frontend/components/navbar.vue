@@ -29,7 +29,6 @@ const router = useRouter();
 
 // Navigationslinks
 const links = [
-  { label: "Übersicht", path: "/dashboard" },
   { label: "Felder", path: "/fields" },
   { label: "Mitarbeiter", path: "/employees" },
   { label: "Maschinen", path: "/machines" },

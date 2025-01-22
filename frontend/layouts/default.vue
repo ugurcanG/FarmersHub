@@ -1,13 +1,11 @@
 <template>
-  <q-layout view="lHh Lpr lFf" class="bg-gray-100">
-    <!-- Header -->
-    <Header />
-    <!-- Navbar -->
+  <q-layout view="lHh Lpr lFf">
+    <!-- Navbar (Global) -->
     <Navbar />
 
-    <!-- Hauptinhalt -->
+    <!-- Seiteninhalt -->
     <q-page-container>
-      <slot />
+      <slot></slot>
     </q-page-container>
 
     <!-- Footer -->
@@ -16,7 +14,6 @@
 </template>
 
 <script setup>
-import Header from "@/components/header.vue";
-import Footer from "@/components/footer.vue";
-import navbar from "~/components/navbar.vue";
+import Navbar from '@/components/navbar.vue';
+import Footer from '@/components/footer.vue';
 </script>
