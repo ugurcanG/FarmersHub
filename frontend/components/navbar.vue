@@ -1,10 +1,7 @@
 <template>
   <q-header elevated class="bg-primary text-white">
     <q-toolbar>
-      <q-toolbar-title
-        class="q-font-bold cursor-pointer"
-        @click="goToHomePage"
-      >
+      <q-toolbar-title class="q-font-bold cursor-pointer" @click="goToHomePage">
         Farmers Hub
       </q-toolbar-title>
       <q-btn-group flat>

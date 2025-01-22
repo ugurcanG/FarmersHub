@@ -24,7 +24,5 @@ export default defineNuxtConfig({
     ],
   },
 
-  css: [
-    "quasar/dist/quasar.sass",
-  ],
+  css: ["quasar/dist/quasar.sass"],
 });

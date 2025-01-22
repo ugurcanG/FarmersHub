@@ -8,23 +8,31 @@
         v-for="(field, index) in fields"
         :key="index"
       >
-        <Card
-          :title="field.name"
-          :content="field.description"
-        />
+        <Card :title="field.name" :content="field.description">
+          <template #icon>
+            <Button
+              color="white"
+              class="q-btn q-btn-item q-btn-round q-btn-flat"
+              @click="handleMoreVert(index)"
+            >
+              <i class="material-icons text-dark">more_vert</i>
+            </Button>
+          </template>
+        </Card>
       </div>
-      
+
       <!-- Card für Hinzufügen -->
       <div class="col-12 col-sm-6 col-md-4">
         <Card>
           <template #content>
-            <div class="q-pa-md flex flex-center text-center full-height">
-              <button
+            <div class="flex flex-center">
+              <Button
                 class="btn btn-flat text-dark rounded"
+                color="white"
                 @click="addField"
               >
-                <i class="material-icons text-h5">add</i>
-              </button>
+                <i class="material-icons text-h5 text-dark">add</i>
+              </Button>
             </div>
           </template>
         </Card>
@@ -36,6 +44,7 @@
 <script setup>
 import { ref } from "vue";
 import Card from "@/components/card.vue";
+import Button from "@/components/button.vue";
 
 const fields = ref([
   { name: "Feld 1", description: "Dies ist das erste Feld" },
@@ -49,5 +58,9 @@ const addField = () => {
     name: `Feld ${newFieldIndex}`,
     description: `Dies ist das Feld Nummer ${newFieldIndex}`,
   });
+};
+
+const handleMoreVert = (index) => {
+  console.log(`More options for field index ${index}`);
 };
 </script>
