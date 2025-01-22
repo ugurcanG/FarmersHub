@@ -6,7 +6,12 @@ module.exports = {
     "./node_modules/quasar/dist/**/*.js", // Quasar-Komponenten
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: "#4CAF50",
+        secondary: "#FF9800",
+      },
+    },
   },
   plugins: [],
 };

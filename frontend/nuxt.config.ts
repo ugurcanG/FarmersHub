@@ -16,7 +16,10 @@ export default defineNuxtConfig({
   vite: {
     plugins: [
       quasar({
-        sassVariables: path.resolve(__dirname, "./src/quasar-variables.sass"),
+        sassVariables: path.resolve(
+          __dirname,
+          "./assets/sass/quasar-variables.sass",
+        ),
       }),
     ],
   },
