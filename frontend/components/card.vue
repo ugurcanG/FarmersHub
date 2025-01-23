@@ -17,6 +17,11 @@
       </div>
     </q-card-section>
 
+    <!-- Bildbereich -->
+    <div class="flex flex-center q-mt-md q-mb-md">
+      <slot name="image"></slot>
+    </div>
+
     <!-- Inhalt -->
     <q-card-section class="text-body1">
       <slot name="content">

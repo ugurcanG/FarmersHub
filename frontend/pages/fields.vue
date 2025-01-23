@@ -18,6 +18,10 @@
               <i class="material-icons text-dark">more_vert</i>
             </Button>
           </template>
+          <template #image>
+            <!-- Hier wird das Bild mit einer Größe von 100x100 Pixeln und einer Drehung von 15 Grad dargestellt-->
+            <div class="bg-green-5" style="width: 100px; height: 100px; transform: rotate(15deg);"></div>
+          </template>
         </Card>
       </div>
 
