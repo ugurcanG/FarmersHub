@@ -5,7 +5,7 @@ import os
 import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
 django.setup()
-from farmershub.models import FieldMeasurement, Field # DO NOT CHANGE! IT IS NEEDED!!!! (yes i hate it too)
+from farmershub.models import FieldMeasurement, Field # ignore error, it works on the server, dunno why
 
 
 def populate_field_measurements(field: Field):
@@ -15,14 +15,26 @@ def populate_field_measurements(field: Field):
 	field_matrix = [[None] * field_size[0]] * field_size[1]
 	
 	# create field average for each measurement value:
-	avg_soil_moisture = random.triangular(70, 130, 100)
-	avg_nutrient_level = random.triangular(5, 150, 80)
 	avg_temperature = random.triangular(-20, 60, 14)
 	avg_humidity = random.triangular(0.1, 0.9, 0.4)
+	avg_soil_moisture = random.triangular(70, 130, 100)
+	avg_nutrient_level = random.triangular(5, 150, 80)
 	
 	# random events that impact measurements:
 	# rain -> higher humidity, soil_moisture, slightly lower temp and nutrient level
 	# dry winds -> low humidity, slightly lower soil_moisture
+	weather_rand = random.random()
+	if 0 < weather_rand < 0.15:
+		# rain:
+		avg_temperature -= 5
+		avg_humidity += 0.1
+		avg_soil_moisture += 20
+		avg_nutrient_level -= 5
+	elif 0.15 < weather_rand < 0.3:
+		# dry days:
+		avg_humidity -= 0.1
+		avg_soil_moisture -= 20
+	
 	
 	for i in range(len(field_matrix)):
 		for j in range(len(field_matrix[i])):

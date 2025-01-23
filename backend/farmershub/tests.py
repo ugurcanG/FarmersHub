@@ -1,6 +1,8 @@
-diff = 11
+import random
 
-if 0.1 < diff or diff < -0.1:
-	print('TRUE')
-else:
-	print('FALSE')
+weather_rand = random.random()
+print(weather_rand)
+if 0 < weather_rand < 0.1:
+	print('test')
+elif 0.1 < weather_rand < 0.2:
+	print('test2')

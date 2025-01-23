@@ -33,7 +33,7 @@ def start_field_measurement_population(request):
 
 
 def get_field_health_index(request):
-    max_diff_temperature = 0.1
+    max_diff_temperature = 15
     max_diff_humidity = 15
     max_diff_soil_moisture = 10
     max_diff_nutrient_level = 50
@@ -47,6 +47,7 @@ def get_field_health_index(request):
         seed_obj = Seed.objects.get(id=field_obj.saat_id)
         
         data = []
+        health_score = float(field_size * 4)
         
         for measurement in field_measurements:
             diff_temperature = measurement.temperature - seed_obj.pref_temperature
@@ -55,15 +56,23 @@ def get_field_health_index(request):
             diff_nutrient_level = measurement.nutrients_level - seed_obj.pref_nutrient_level
             
             if max_diff_temperature < diff_temperature or diff_temperature < -max_diff_temperature:
-                data.append(['WARNING temp', measurement.temperature, seed_obj.pref_temperature])
+                data.append(['WARNING temperature', measurement.temperature, seed_obj.pref_temperature])
+                health_score -= 1
             if max_diff_humidity < diff_humidity or diff_humidity < -max_diff_humidity:
-                data.append(['WARNING humid', measurement.humidity, seed_obj.pref_humidity])
+                data.append(['WARNING humidity', measurement.humidity, seed_obj.pref_humidity])
+                health_score -= 1
             if max_diff_soil_moisture < diff_soil_moisture or diff_soil_moisture < -max_diff_soil_moisture:
-                data.append(['WARNING moist', measurement.soil_moisture, seed_obj.pref_soil_moisture])
+                data.append(['WARNING soil_moisture', measurement.soil_moisture, seed_obj.pref_soil_moisture])
+                health_score -= 1
             if max_diff_nutrient_level < diff_nutrient_level or diff_nutrient_level < -max_diff_nutrient_level:
-                data.append(['WARNING nutri', measurement.nutrients_level, seed_obj.pref_nutrient_level])
+                data.append(['WARNING nutrients_level', measurement.nutrients_level, seed_obj.pref_nutrient_level])
+                health_score -= 1
         
-        data_dict = {"warnings": data}
+        data_dict = {
+            "field_size": field_size,
+            "health_score": f"{health_score}/{field_size * 4}",
+            "warnings": data,
+        }
 
         serialized_data = json.dumps(data_dict)
         
