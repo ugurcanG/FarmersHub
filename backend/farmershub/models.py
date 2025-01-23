@@ -11,7 +11,8 @@ from django.db import models
 class Field(models.Model):
     id = models.BigAutoField(primary_key=True)
     created_at = models.DateTimeField()
-    size = models.FloatField()
+    width = models.IntegerField(blank=True, null=True)
+    height = models.IntegerField(blank=True, null=True)
     saat = models.ForeignKey('Seed', models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
@@ -38,6 +39,10 @@ class Seed(models.Model):
     created_at = models.DateTimeField()
     name = models.TextField(unique=True)
     mass_kg = models.FloatField()
+    pref_temperature = models.FloatField(blank=True, null=True)
+    pref_humidity = models.FloatField(blank=True, null=True)
+    pref_soil_moisture = models.FloatField(blank=True, null=True)
+    pref_nutrient_level = models.FloatField(blank=True, null=True)
 
     class Meta:
         db_table = 'seed'

@@ -1,3 +1,6 @@
-from django.test import TestCase
+diff = 11
 
-# Create your tests here.
+if 0.1 < diff or diff < -0.1:
+	print('TRUE')
+else:
+	print('FALSE')
