@@ -4,6 +4,8 @@ from threading import Thread
 
 from django.core import serializers
 from django.http import HttpResponse
+from django.http import JsonResponse
+
 
 from . import simulation
 from .models import Seed, Field, FieldMeasurement
@@ -79,6 +81,17 @@ def get_field_health_index(request):
         return HttpResponse(serialized_data, status=200)
     except (ValueError, TypeError):
         return HttpResponse("id not valid")
+
+# http://127.0.0.1:8000/fields/
 def get_fields(request):
-    fields = Field.objects.all().values('id', 'created_at', 'size', 'saat__name')  # Felder mit Saatgutnamen
-    return JsonResponse(list(fields), safe=False)
+    try:
+        # Felder mit den relevanten Daten abrufen
+        fields = Field.objects.all().values(
+            'id', 'created_at', 'width', 'height', 'saat__name'
+        )  # 'saat__name' für den Namen des Saatguts
+        for field in fields:
+            field['size'] = field['width'] * field['height']  # Fläche berechnen
+        return JsonResponse(list(fields), safe=False)
+    
+    except (ValueError, TypeError):
+        return HttpResponse("id not valid")

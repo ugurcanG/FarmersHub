@@ -24,7 +24,8 @@ SECRET_KEY = 'django-insecure-^*y71tjyyf+1gvsv)=72x!e!znq^=(34y&6if0+mp400x0&8w5
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
+# CORS-Setup
+CORS_ALLOW_ALL_ORIGINS = True
 ALLOWED_HOSTS = []
 
 
@@ -37,11 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'farmershub',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

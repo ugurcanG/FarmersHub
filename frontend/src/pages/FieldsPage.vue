@@ -8,7 +8,16 @@
         v-for="(field, index) in fields"
         :key="field.id"
       >
-        <Card :title="'Feld ' + field.id" :content="'Größe: ' + field.size + ' ha'">
+        <Card :title="'Feld ' + field.id">
+          <template #content>
+            <div class="content-container">
+              <p>Größe: {{ field.size }} ha</p>
+              <!-- Platzierung des Saatguts rechts unten -->
+              <p class="saat-info">
+                Saatgut: <span>{{ field.saat__name || 'Kein Saatgut zugewiesen' }}</span>
+              </p>
+            </div>
+          </template>
           <template #icon>
             <Button
               color="white"
@@ -51,9 +60,9 @@ import Button from 'src/components/BaseButton.vue';
 
 interface Field {
   id: number;
-  size: number;
+  size: number; // Größe des Feldes
   created_at: string;
-  saat_name: string | null;
+  saat__name: string | null; // Name des Saatguts (falls vorhanden)
 }
 
 const fields = ref<Field[]>([]);
@@ -62,7 +71,8 @@ const fields = ref<Field[]>([]);
 const fetchFields = async (): Promise<void> => {
   try {
     const response = await api.get('/fields/');
-    fields.value = response.data; // Daten setzen
+    console.log('Felder abgerufen:', response.data);
+    fields.value = response.data; // Felder setzen
   } catch (error) {
     console.error('Fehler beim Abrufen der Felder:', error);
   }
@@ -77,7 +87,25 @@ const handleMoreVert = (index: number): void => {
 };
 
 // Beim Laden der Seite Felder abrufen
-onMounted(() => {
-  fetchFields();
+onMounted(async () => {
+  await fetchFields();
 });
 </script>
+
+<style scoped>
+.content-container {
+  position: relative; /* Relativer Container für absolute Platzierung */
+}
+
+/* Stil für den Saatguts-Bereich rechts unten */
+.saat-info {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: 0.9rem;
+  color: white;
+  margin: 0;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+</style>
