@@ -10,6 +10,7 @@ from django.db import models
 
 class Field(models.Model):
     id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=255, blank=True, null=True) 
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     width = models.IntegerField(blank=True, null=True)
     height = models.IntegerField(blank=True, null=True)

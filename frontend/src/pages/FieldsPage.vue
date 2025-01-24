@@ -2,12 +2,13 @@
   <q-page class="q-pa-md">
     <h3 class="text-h5 text-dark">Felder</h3>
     <div class="row q-col-gutter-lg">
+      <!-- Bestehende Felder anzeigen -->
       <div
         class="col-12 col-sm-6 col-md-4"
         v-for="(field, index) in fields"
         :key="field.id"
       >
-        <Card :title="'Feld ' + field.id">
+        <Card :title="field.name ">
           <template #content>
             <div class="content-container">
               <p>Größe: {{ field.size }} ha</p>
@@ -50,6 +51,7 @@
         </Card>
       </div>
 
+      <!-- Card für Hinzufügen -->
       <div class="col-12 col-sm-6 col-md-4">
         <Card>
           <template #content>
@@ -67,10 +69,19 @@
       </div>
     </div>
 
+    <!-- Modal für neues Feld erstellen -->
     <FieldModal
       :showModal="showAddFieldModal"
       @close="showAddFieldModal = false"
       @submit="addField"
+    />
+
+    <!-- Modal für Feld bearbeiten -->
+    <FieldModal
+      :showModal="showEditFieldModal"
+      :fieldToEdit="fieldToEdit"
+      @close="closeEditModal"
+      @submit="updateField"
     />
 
     <!-- Löschdialog -->
@@ -100,58 +111,83 @@ import FieldModal from 'src/components/modals/FieldModal.vue';
 
 interface Field {
   id: number;
+  name: string; // Name des Feldes
   size: number; // Größe des Feldes
   created_at: string;
   saat__name: string | null; // Name des Saatguts (falls vorhanden)
+  width: number;
+  height: number;
+  saat_name: string;
 }
 
 const fields = ref<Field[]>([]);
 const showAddFieldModal = ref(false);
-const showDeleteDialog = ref(false); // Dialogzustand für Löschen
+const showEditFieldModal = ref(false); // Zustand des Bearbeitungsmodals
+const showDeleteDialog = ref(false); // Zustand für den Löschdialog
 const selectedFieldIndex = ref<number | null>(null); // Index des zu löschenden Feldes
+const fieldToEdit = ref<Field | null>(null); // Das Feld, das bearbeitet wird
 
+// Menü für jedes Feld
 const menuState = ref<boolean[]>([]);
 
 const toggleMenu = (index: number) => {
   menuState.value = fields.value.map((_, i) => i === index ? !menuState.value[index] : false);
 };
 
+// Bearbeiten eines Feldes
 const editField = (index: number) => {
-  console.log('Feld bearbeiten:', fields.value[index]);
+  fieldToEdit.value = fields.value[index] || null;
+  showEditFieldModal.value = true; // Bearbeitungsmodal öffnen
 };
 
-// Löschbestätigung anzeigen
+// Schließt das Bearbeitungsmodal
+const closeEditModal = () => {
+  showEditFieldModal.value = false;
+  fieldToEdit.value = null; // Zurücksetzen
+};
+
+// Aktualisiert ein Feld
+const updateField = async (updatedField: { name: string; width: number; height: number; saat_name: string }) => {
+    if (!fieldToEdit.value) return;
+
+    try {
+        const response = await api.put(`/fields/update/${fieldToEdit.value.id}/`, updatedField);
+        console.log(`Feld ${fieldToEdit.value.id} erfolgreich aktualisiert`, response.data);
+
+        const updatedIndex = fields.value.findIndex(f => f.id === fieldToEdit.value?.id);
+        if (updatedIndex !== -1) {
+            fields.value[updatedIndex] = { ...fields.value[updatedIndex], ...response.data };
+        }
+
+        closeEditModal();
+    } catch (error) {
+        console.error('Fehler beim Aktualisieren des Feldes:', error);
+    }
+};
+
+// Löschen eines Feldes bestätigen
 const confirmDelete = (index: number) => {
   selectedFieldIndex.value = index;
   showDeleteDialog.value = true;
 };
 
-// Feld löschen
+// Löscht ein Feld
 const deleteField = async (index: number | null) => {
-  if (index === null || index < 0 || index >= fields.value.length) {
-    console.error('Ungültiger Index für das zu löschende Feld.');
-    return;
-  }
+  if (index === null || index < 0 || index >= fields.value.length) return;
 
   const field = fields.value[index];
-  if (!field) {
-    console.error('Feld nicht gefunden.');
-    return;
-  }
-
+  if (!field) return; // Ensure field is defined
   try {
     await api.delete(`/fields/delete/${field.id}/`);
-    console.log(`Feld ${field.id} erfolgreich gelöscht`);
-    fields.value.splice(index, 1); // Feld aus der Liste entfernen
-    menuState.value.splice(index, 1); // Menüstatus ebenfalls aktualisieren
-    showDeleteDialog.value = false;
+    fields.value.splice(index, 1); // Entferne das Feld aus der Liste
+    menuState.value.splice(index, 1); // Entferne den Menüstatus
+    showDeleteDialog.value = false; // Schließe den Dialog
   } catch (error) {
     console.error('Fehler beim Löschen des Feldes:', error);
   }
 };
 
-
-// Felder aus Backend laden
+// Felder laden
 const fetchFields = async (): Promise<void> => {
   try {
     const response = await api.get('/fields/');
@@ -162,12 +198,13 @@ const fetchFields = async (): Promise<void> => {
   }
 };
 
-const addField = async (fieldData: { width: number; height: number; saat_name: string }) => {
+// Neues Feld erstellen
+const addField = async (fieldData: { name: string; width: number; height: number; saat_name: string }) => {
   try {
     const response = await api.post('/fields/add/', fieldData);
-    fields.value.push(response.data);
-    menuState.value.push(false);
-    showAddFieldModal.value = false;
+    fields.value.push(response.data); // Das neue Feld zur Liste hinzufügen
+    menuState.value.push(false); // Menüstatus initialisieren
+    showAddFieldModal.value = false; // Modal schließen
   } catch (error) {
     console.error('Fehler beim Hinzufügen eines neuen Feldes:', error);
   }
@@ -175,3 +212,19 @@ const addField = async (fieldData: { width: number; height: number; saat_name: s
 
 onMounted(fetchFields);
 </script>
+
+<style scoped>
+.content-container {
+  position: relative;
+}
+.saat-info {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: 0.9rem;
+  color: white;
+  margin: 0;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+</style>

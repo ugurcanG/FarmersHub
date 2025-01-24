@@ -2,10 +2,16 @@
   <q-dialog v-model="localShowModal">
     <q-card>
       <q-card-section>
-        <h4>Neues Feld erstellen</h4>
+        <h4 v-if="fieldToEdit">Feld bearbeiten</h4>
+        <h4 v-else>Neues Feld erstellen</h4>
       </q-card-section>
 
       <q-card-section>
+        <q-input
+          v-model="fieldData.name"
+          label="Name"
+          filled
+        />
         <q-input
           v-model="fieldData.width"
           type="number"
@@ -27,44 +33,73 @@
 
       <q-card-actions align="right">
         <q-btn flat label="Abbrechen" @click="cancel" />
-        <q-btn color="primary" label="Erstellen" @click="submitField" />
+        <q-btn
+          color="primary"
+          :label="fieldToEdit ? 'Speichern' : 'Erstellen'"
+          @click="submitField"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits, defineProps, computed } from 'vue';
+import { ref, defineEmits, defineProps, computed, watch } from 'vue';
+import type { PropType } from 'vue';
 
-const emit = defineEmits(['close', 'submit']); // Emit-Events für den Parent
-const { showModal } = defineProps({
-  showModal: Boolean, // Erwartet Prop vom Parent
-});
-
-// Lokales `ref` für das Modal, synchronisiert mit `showModal`
-const localShowModal = computed({
-  get: () => showModal,
-  set: (value) => {
-    if (!value) emit('close'); // Schließt das Modal, wenn es deaktiviert wird
+const emit = defineEmits(['close', 'submit']);
+const { showModal, fieldToEdit } = defineProps({
+  showModal: Boolean,
+  fieldToEdit: {
+    type: Object as PropType<{ width: number; height: number; saat_name: string } | null>,
+    default: null,
   },
 });
 
-const fieldData = ref({
-  width: null as number | null,
-  height: null as number | null,
-  saat_name: '' as string,
+const localShowModal = computed({
+  get: () => showModal,
+  set: (value) => {
+    if (!value) emit('close');
+  },
 });
+
+// Typ für die Felddaten
+interface FieldData {
+  name: string,
+  width: number | null;
+  height: number | null;
+  saat_name: string;
+}
+
+const fieldData = ref<FieldData>({
+  name: '' as string,
+  width: null,
+  height: null,
+  saat_name: '',
+});
+
+// Aktualisiere die Felddaten, wenn `fieldToEdit` sich ändert
+watch(
+  () => fieldToEdit,
+  (newField) => {
+    if (newField) {
+      fieldData.value = { name: '', ...newField }; // Kopiere die Felddaten und füge den Namen hinzu
+    } else {
+      fieldData.value = { name: '',width: null, height: null, saat_name: '' }; // Zurücksetzen
+    }
+  },
+  { immediate: true } // Direkt beim ersten Mounting ausführen
+);
 
 const submitField = () => {
   if (!fieldData.value.width || !fieldData.value.height) {
     console.error('Breite und Höhe sind erforderlich!');
     return;
   }
-  emit('submit', { ...fieldData.value }); // Daten an den Parent zurückgeben
-  fieldData.value = { width: null, height: null, saat_name: '' }; // Eingabefelder zurücksetzen
+  emit('submit', { ...fieldData.value }); // Sende die Daten an den Parent
 };
 
 const cancel = () => {
-  emit('close'); // Modal schließen
+  emit('close'); // Schließe das Modal
 };
 </script>

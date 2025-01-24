@@ -88,7 +88,7 @@ def get_fields(request):
     try:
         # Felder mit den relevanten Daten abrufen
         fields = Field.objects.all().values(
-            'id', 'created_at', 'width', 'height', 'saat__name'
+            'id', 'name', 'created_at', 'width', 'height', 'saat__name'
         )  # 'saat__name' für den Namen des Saatguts
         for field in fields:
             field['size'] = field['width'] * field['height']  # Fläche berechnen
@@ -103,7 +103,8 @@ def add_field(request):
     if request.method == "POST":
         data = json.loads(request.body.decode('utf-8'))
         
-        # Hole die Werte aus dem Request und konvertiere sie in Integer
+        # Hole die Werte aus dem Request
+        name = data.get("name")
         width = data.get("width")
         height = data.get("height")
         saat_name = data.get("saat_name")
@@ -121,11 +122,12 @@ def add_field(request):
         seed = Seed.objects.filter(name=saat_name).first() if saat_name else None
 
         # Feld erstellen
-        field = Field.objects.create(width=width, height=height, saat=seed)
+        field = Field.objects.create(name=name, width=width, height=height, saat=seed)
 
         # Antwortdaten vorbereiten
         field_data = {
             "id": field.id,
+            "name": field.name,
             "width": field.width,
             "height": field.height,
             "size": field.width * field.height,
@@ -145,4 +147,53 @@ def delete_field(request, field_id):
             return JsonResponse({"message": "Feld erfolgreich gelöscht"}, status=200)
         except Field.DoesNotExist:
             return JsonResponse({"error": "Feld nicht gefunden"}, status=404)
+    return JsonResponse({"error": "Ungültige Anfrage"}, status=400)
+
+
+# http://127.0.0.1:8000/fields/update/<int:field_id>/
+@csrf_exempt
+def update_field(request, field_id):
+    if request.method == "PUT":
+        try:
+            # Hole das Feld, das aktualisiert werden soll
+            field = Field.objects.get(id=field_id)
+        except Field.DoesNotExist:
+            return JsonResponse({"error": "Feld nicht gefunden"}, status=404)
+
+        # Parse die JSON-Daten aus dem Request
+        try:
+            data = json.loads(request.body)
+            name = data.get("name")
+            width = data.get("width")
+            height = data.get("height")
+            saat_name = data.get("saat_name")
+
+            if name is not None:
+                field.name = name
+            if width is not None:
+                field.width = int(width)
+            if height is not None:
+                field.height = int(height)
+
+            # Aktualisiere Saatgut, falls angegeben
+            if saat_name is not None:
+                from .models import Seed
+                seed = Seed.objects.filter(name=saat_name).first()
+                field.saat = seed
+
+            field.save()
+
+            # Berechne die Größe des Feldes
+            field_data = {
+                "id": field.id,
+                "name": field.name,
+                "width": field.width,
+                "height": field.height,
+                "size": field.width * field.height,
+                "saat__name": field.saat.name if field.saat else None,
+                "created_at": field.created_at,
+            }
+            return JsonResponse(field_data, status=200)
+        except ValueError:
+            return JsonResponse({"error": "Ungültige Daten"}, status=400)
     return JsonResponse({"error": "Ungültige Anfrage"}, status=400)
