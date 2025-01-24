@@ -30,9 +30,9 @@
 </template>
 
 <script setup lang="ts">
-import Footer from "../../frontend/src/components/AppFooter.vue";
-import Card from "../../frontend/src/components/BaseCard.vue";
-import Button from "../../frontend/src/components/BaseButton.vue";
+import Footer from "../components/AppFooter.vue";
+import Card from "../components/BaseCard.vue";
+import Button from "../components/BaseButton.vue";
 
 interface Machine {
   id: number;

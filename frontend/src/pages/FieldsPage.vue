@@ -6,9 +6,9 @@
       <div
         class="col-12 col-sm-6 col-md-4"
         v-for="(field, index) in fields"
-        :key="index"
+        :key="field.id"
       >
-        <Card :title="field.name" :content="field.description">
+        <Card :title="'Feld ' + field.id" :content="'Größe: ' + field.size + ' ha'">
           <template #icon>
             <Button
               color="white"
@@ -19,7 +19,10 @@
             </Button>
           </template>
           <template #image>
-            <div class="bg-green-5" style="width: 100px; height: 100px; transform: rotate(15deg);"></div>
+            <div
+              class="bg-green-5"
+              style="width: 100px; height: 100px; transform: rotate(15deg);"
+            ></div>
           </template>
         </Card>
       </div>
@@ -41,30 +44,40 @@
 </template>
 
 <script setup lang="ts">
-interface Field {
-  name: string;
-  description: string;
-}
-
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { api } from 'boot/axios'; // Axios-Instanz
 import Card from 'src/components/BaseCard.vue';
 import Button from 'src/components/BaseButton.vue';
 
-const fields = ref<Field[]>([
-  { name: "Feld 1", description: "Dies ist das erste Feld" },
-  { name: "Feld 2", description: "Dies ist das zweite Feld" },
-  { name: "Feld 3", description: "Dies ist das dritte Feld" },
-]);
+interface Field {
+  id: number;
+  size: number;
+  created_at: string;
+  saat_name: string | null;
+}
+
+const fields = ref<Field[]>([]);
+
+// Felder aus Backend laden
+const fetchFields = async (): Promise<void> => {
+  try {
+    const response = await api.get('/fields/');
+    fields.value = response.data; // Daten setzen
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Felder:', error);
+  }
+};
 
 const addField = (): void => {
-  const newFieldIndex = fields.value.length + 1;
-  fields.value.push({
-    name: `Feld ${newFieldIndex}`,
-    description: `Dies ist das Feld Nummer ${newFieldIndex}`,
-  });
+  console.log("Neue Felder hinzufügen ist noch nicht implementiert!");
 };
 
 const handleMoreVert = (index: number): void => {
-  console.log(`More options for field index ${index}`);
+  console.log(`Optionen für Feld mit Index ${index}`);
 };
+
+// Beim Laden der Seite Felder abrufen
+onMounted(() => {
+  fetchFields();
+});
 </script>

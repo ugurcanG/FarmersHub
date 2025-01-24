@@ -79,3 +79,6 @@ def get_field_health_index(request):
         return HttpResponse(serialized_data, status=200)
     except (ValueError, TypeError):
         return HttpResponse("id not valid")
+def get_fields(request):
+    fields = Field.objects.all().values('id', 'created_at', 'size', 'saat__name')  # Felder mit Saatgutnamen
+    return JsonResponse(list(fields), safe=False)

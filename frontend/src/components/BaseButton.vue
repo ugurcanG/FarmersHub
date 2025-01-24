@@ -3,8 +3,10 @@
     :label="label"
     :color="color"
     :icon="icon"
+    class="button-custom"
+    :unelevated="unelevated"
     :flat="flat"
-    :round="round"
+    :rounded="rounded"
     :dense="dense"
     v-bind="props"
     @click="onClick"
@@ -15,7 +17,7 @@
 
 <script setup lang="ts">
 import type { QBtnProps } from "quasar";
-import type { PropType } from 'vue';
+import type { PropType } from "vue";
 
 defineProps({
   label: {
@@ -30,13 +32,17 @@ defineProps({
     type: String as PropType<string>,
     default: ""
   },
+  unelevated: {
+    type: Boolean as PropType<boolean>,
+    default: false
+  },
   flat: {
     type: Boolean as PropType<boolean>,
     default: false
   },
-  round: {
+  rounded: {
     type: Boolean as PropType<boolean>,
-    default: false
+    default: true
   },
   dense: {
     type: Boolean as PropType<boolean>,
@@ -52,3 +58,15 @@ defineProps({
   }
 });
 </script>
+
+<style lang="scss">
+.button-custom {
+  font-weight: bold; /* Fett für den Text */
+  font-size: 1.1rem; /* Textgröße anpassen */
+  text-transform: uppercase; /* Text in Großbuchstaben */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid;
+}
+</style>

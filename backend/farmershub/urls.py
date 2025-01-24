@@ -24,4 +24,5 @@ urlpatterns = [
 	path('helloworld/', views.view_helloworld),
 	path('measurements/', views.start_field_measurement_population),
 	path('test/', views.get_field_health_index),
+    path('fields/', views.get_fields, name='get-fields'),
 ]
