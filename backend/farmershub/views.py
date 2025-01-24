@@ -133,3 +133,16 @@ def add_field(request):
             "created_at": field.created_at,
         }
         return JsonResponse(field_data, status=201)
+
+# http://127.0.0.1:8000/fields/delete/<int:field_id>/
+@csrf_exempt
+def delete_field(request, field_id):
+    if request.method == "DELETE":
+        try:
+            # Hole das Feld mit der gegebenen ID
+            field = Field.objects.get(id=field_id)
+            field.delete()  # Lösche das Feld
+            return JsonResponse({"message": "Feld erfolgreich gelöscht"}, status=200)
+        except Field.DoesNotExist:
+            return JsonResponse({"error": "Feld nicht gefunden"}, status=404)
+    return JsonResponse({"error": "Ungültige Anfrage"}, status=400)
