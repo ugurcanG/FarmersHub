@@ -43,11 +43,16 @@
             </q-menu>
           </template>
           <template #image>
-            <div
-              class="bg-green-5"
-              style="width: 100px; height: 100px; transform: rotate(15deg);"
-            ></div>
-          </template>
+  <div
+    :class="{
+      'bg-green-5': field.health_score !== null && field.health_score >= 3,
+      'bg-orange-5': field.health_score !== null && field.health_score >= 2 && field.health_score < 3,
+      'bg-red-5': field.health_score !== null && field.health_score < 2,
+    }"
+    style="width: 100px; height: 100px; transform: rotate(15deg); border: 1px;"
+  ></div>
+</template>
+
         </Card>
       </div>
 
@@ -118,6 +123,7 @@ interface Field {
   width: number;
   height: number;
   saat_name: string;
+  health_score: number | null;
 }
 
 const fields = ref<Field[]>([]);

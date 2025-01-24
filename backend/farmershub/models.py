@@ -29,6 +29,7 @@ class FieldMeasurement(models.Model):
     humidity = models.FloatField(blank=True, null=True)
     soil_moisture = models.FloatField(blank=True, null=True)
     nutrients_level = models.FloatField(blank=True, null=True)
+    health_score = models.FloatField(blank=True, null=True)
     field = models.ForeignKey(Field, models.DO_NOTHING, blank=True, null=True)
 
     class Meta:

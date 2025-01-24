@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 from django.http import HttpResponse
 from django.http import JsonResponse
+from django.db import models
 
 
 from . import simulation
@@ -86,16 +87,44 @@ def get_field_health_index(request):
 # http://127.0.0.1:8000/fields/
 def get_fields(request):
     try:
-        # Felder mit den relevanten Daten abrufen
-        fields = Field.objects.all().values(
-            'id', 'name', 'created_at', 'width', 'height', 'saat__name'
-        )  # 'saat__name' für den Namen des Saatguts
+        # Abrufen aller Felder
+        fields = Field.objects.all()
+
+        field_list = []
         for field in fields:
-            field['size'] = field['width'] * field['height']  # Fläche berechnen
-        return JsonResponse(list(fields), safe=False)
-    
-    except (ValueError, TypeError):
-        return HttpResponse("id not valid")
+            # Berechne die Feldgröße
+            size = field.width * field.height
+
+            # Finde die zugehörigen Messungen
+            field_measurements = FieldMeasurement.objects.filter(field=field)
+
+            # Berechne den durchschnittlichen Healthscore
+            if field_measurements.exists():
+                total_health_score = field_measurements.aggregate(models.Sum('health_score'))['health_score__sum'] or 0
+                measurement_count = field_measurements.count()
+                avg_health_score = total_health_score / measurement_count if measurement_count > 0 else None
+            else:
+                avg_health_score = None
+
+            # Daten für das Feld vorbereiten
+            field_data = {
+                "id": field.id,
+                "name": field.name,
+                "width": field.width,
+                "height": field.height,
+                "size": size,
+                "saat__name": field.saat.name if field.saat else None,
+                "created_at": field.created_at,
+                "health_score": avg_health_score,  # Durchschnittlicher Healthscore
+            }
+
+            field_list.append(field_data)
+
+        return JsonResponse(field_list, safe=False)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+
     
 # http://127.0.0.1:8000/fields/add/
 @csrf_exempt
