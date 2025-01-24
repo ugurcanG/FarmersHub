@@ -1,7 +1,8 @@
 import json
 
 from threading import Thread
-
+from django.utils.timezone import now
+from django.views.decorators.csrf import csrf_exempt
 from django.core import serializers
 from django.http import HttpResponse
 from django.http import JsonResponse
@@ -95,3 +96,40 @@ def get_fields(request):
     
     except (ValueError, TypeError):
         return HttpResponse("id not valid")
+    
+# http://127.0.0.1:8000/fields/add/
+@csrf_exempt
+def add_field(request):
+    if request.method == "POST":
+        data = json.loads(request.body.decode('utf-8'))
+        
+        # Hole die Werte aus dem Request und konvertiere sie in Integer
+        width = data.get("width")
+        height = data.get("height")
+        saat_name = data.get("saat_name")
+
+        if not width or not height:
+            return JsonResponse({"error": "Breite und Höhe sind erforderlich!"}, status=400)
+
+        try:
+            width = int(width)  # Konvertiere zu Integer
+            height = int(height)  # Konvertiere zu Integer
+        except ValueError:
+            return JsonResponse({"error": "Breite und Höhe müssen Zahlen sein!"}, status=400)
+
+        # Saatgut suchen, falls angegeben
+        seed = Seed.objects.filter(name=saat_name).first() if saat_name else None
+
+        # Feld erstellen
+        field = Field.objects.create(width=width, height=height, saat=seed)
+
+        # Antwortdaten vorbereiten
+        field_data = {
+            "id": field.id,
+            "width": field.width,
+            "height": field.height,
+            "size": field.width * field.height,
+            "saat__name": field.saat.name if field.saat else None,
+            "created_at": field.created_at,
+        }
+        return JsonResponse(field_data, status=201)

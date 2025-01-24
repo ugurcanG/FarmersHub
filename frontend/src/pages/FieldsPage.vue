@@ -12,7 +12,6 @@
           <template #content>
             <div class="content-container">
               <p>Größe: {{ field.size }} ha</p>
-              <!-- Platzierung des Saatguts rechts unten -->
               <p class="saat-info">
                 Saatgut: <span>{{ field.saat__name || 'Kein Saatgut zugewiesen' }}</span>
               </p>
@@ -28,6 +27,7 @@
             </Button>
           </template>
           <template #image>
+            <!-- Quadrat, das das Feld repräsentiert -->
             <div
               class="bg-green-5"
               style="width: 100px; height: 100px; transform: rotate(15deg);"
@@ -41,7 +41,11 @@
         <Card>
           <template #content>
             <div class="flex flex-center">
-              <Button class="btn btn-flat text-dark rounded" color="white" @click="addField">
+              <Button
+                class="btn btn-flat text-dark rounded"
+                color="white"
+                @click="showAddFieldModal = true"
+              >
                 <i class="material-icons text-h5 text-dark">add</i>
               </Button>
             </div>
@@ -49,6 +53,13 @@
         </Card>
       </div>
     </div>
+
+    <!-- Ausgelagertes Modal -->
+    <FieldModal
+      :showModal="showAddFieldModal"
+      @close="showAddFieldModal = false"
+      @submit="addField"
+    />
   </q-page>
 </template>
 
@@ -57,6 +68,7 @@ import { ref, onMounted } from 'vue';
 import { api } from 'boot/axios'; // Axios-Instanz
 import Card from 'src/components/BaseCard.vue';
 import Button from 'src/components/BaseButton.vue';
+import FieldModal from 'src/components/modals/FieldModal.vue';
 
 interface Field {
   id: number;
@@ -66,24 +78,33 @@ interface Field {
 }
 
 const fields = ref<Field[]>([]);
+const showAddFieldModal = ref(false);
+
+const handleMoreVert = (index: number) => {
+  console.log('More options for field at index:', index);
+};
 
 // Felder aus Backend laden
 const fetchFields = async (): Promise<void> => {
   try {
     const response = await api.get('/fields/');
     console.log('Felder abgerufen:', response.data);
-    fields.value = response.data; // Felder setzen
+    fields.value = response.data;
   } catch (error) {
     console.error('Fehler beim Abrufen der Felder:', error);
   }
 };
 
-const addField = (): void => {
-  console.log("Neue Felder hinzufügen ist noch nicht implementiert!");
-};
-
-const handleMoreVert = (index: number): void => {
-  console.log(`Optionen für Feld mit Index ${index}`);
+// Neues Feld erstellen
+const addField = async (fieldData: { width: number; height: number; saat_name: string }) => {
+  try {
+    const response = await api.post('/fields/add/', fieldData);
+    console.log('Feld hinzugefügt:', response.data);
+    fields.value.push(response.data); // Neues Feld zur Liste hinzufügen
+    showAddFieldModal.value = false;
+  } catch (error) {
+    console.error('Fehler beim Hinzufügen eines neuen Feldes:', error);
+  }
 };
 
 // Beim Laden der Seite Felder abrufen
@@ -94,10 +115,8 @@ onMounted(async () => {
 
 <style scoped>
 .content-container {
-  position: relative; /* Relativer Container für absolute Platzierung */
+  position: relative;
 }
-
-/* Stil für den Saatguts-Bereich rechts unten */
 .saat-info {
   position: absolute;
   bottom: 0;

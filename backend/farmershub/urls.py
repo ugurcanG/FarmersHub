@@ -25,4 +25,5 @@ urlpatterns = [
 	path('measurements/', views.start_field_measurement_population),
 	path('test/', views.get_field_health_index),
     path('fields/', views.get_fields, name='get-fields'),
+    path('fields/add/', views.add_field, name='add-field'),
 ]

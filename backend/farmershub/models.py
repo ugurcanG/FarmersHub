@@ -10,7 +10,7 @@ from django.db import models
 
 class Field(models.Model):
     id = models.BigAutoField(primary_key=True)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     width = models.IntegerField(blank=True, null=True)
     height = models.IntegerField(blank=True, null=True)
     saat = models.ForeignKey('Seed', models.DO_NOTHING, blank=True, null=True)
