@@ -29,4 +29,5 @@ urlpatterns = [
     path('fields/delete/<int:field_id>/', views.delete_field, name='delete-field'),
     path('fields/update/<int:field_id>/', views.update_field, name='update-field'),
     path('fields/<int:field_id>/', views.get_field_details, name='get-field-details'),
+    path('fields/<int:field_id>/measurements/', views.get_field_measurements, name='get-field-measurements'),
 ]

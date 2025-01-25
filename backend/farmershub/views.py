@@ -242,3 +242,26 @@ def get_field_details(request, field_id):
         return JsonResponse(data, safe=False)
     except Field.DoesNotExist:
         return JsonResponse({"error": "Feld nicht gefunden"}, status=404)
+    
+def get_field_measurements(request, field_id):
+    try:
+        # Hole alle Messwerte für das gegebene Feld
+        measurements = FieldMeasurement.objects.filter(field_id=field_id).order_by('created_at')
+        
+        # Konvertiere die Daten in eine Liste von Dictionaries
+        measurement_list = [
+            {
+                "id": measurement.id,
+                "created_at": measurement.created_at,
+                "temperature": measurement.temperature,
+                "humidity": measurement.humidity,
+                "soil_moisture": measurement.soil_moisture,
+                "nutrients_level": measurement.nutrients_level,
+                "health_score": measurement.health_score,
+            }
+            for measurement in measurements
+        ]
+        
+        return JsonResponse(measurement_list, safe=False, status=200)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
