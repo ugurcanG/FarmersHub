@@ -10,7 +10,7 @@
           :key="link.path"
           :label="link.label"
           :flat="true"
-          :class="{'text-secondary': isActive(link.path)}"
+          :class="{ 'text-secondary': isActive(link.path) }"
           @click="goTo(link.path)"
         />
       </q-btn-group>
@@ -19,26 +19,26 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter, useRoute } from "vue-router";
+import { useRouter, useRoute } from 'vue-router'
 
-const router = useRouter();
-const route = useRoute();
+const router = useRouter()
+const route = useRoute()
 
 interface Link {
-  label: string;
-  path: string;
+  label: string
+  path: string
 }
 
 const links: Link[] = [
-  { label: "Felder", path: "/fields" },
-  { label: "Mitarbeiter", path: "/employees" },
-  { label: "Maschinen", path: "/machines" },
-  { label: "Markt", path: "/market" },
-];
+  { label: 'Felder', path: '/fields' },
+  { label: 'Mitarbeiter', path: '/employees' },
+  { label: 'Maschinen', path: '/machines' },
+  { label: 'Markt', path: '/market' },
+]
 
 const goTo = (path: string): void => {
-  void router.push(path);
-};
+  void router.push(path)
+}
 
-const isActive = (path: string): boolean => route.path === path;
+const isActive = (path: string): boolean => route.path === path
 </script>

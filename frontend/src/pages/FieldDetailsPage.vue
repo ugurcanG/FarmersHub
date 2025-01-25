@@ -20,13 +20,7 @@
     <q-card class="q-pa-md shadow-2 q-mt-md">
       <q-card-section>
         <h4 class="text-h6">Messwerte</h4>
-        <q-table
-          :rows="measurements"
-          :columns="columns"
-          row-key="id"
-          flat
-          bordered
-        >
+        <q-table :rows="measurements" :columns="columns" row-key="id" flat bordered>
           <template v-slot:top-right>
             <q-btn flat icon="refresh" @click="fetchMeasurements" label="Aktualisieren" />
           </template>
@@ -67,8 +61,8 @@
         </div>
       </q-card-section>
     </q-card>
-        <!-- Floating Button -->
-        <q-btn
+    <!-- Floating Button -->
+    <q-btn
       v-if="!chatDrawerOpen"
       round
       glossy
@@ -78,23 +72,17 @@
       @click="toggleChat"
     />
   </q-page>
-      <!-- Chat Drawer -->
-      <q-drawer
-      v-model="chatDrawerOpen"
-      side="right"
-      :width="350"
-      bordered
-      class="drawer-style"
-    >
-      <!-- Chat Header -->
-      <div class="q-pa-md drawer-header">
-        <h5>Chat mit GPT</h5>
-        <q-btn flat dense icon="close" class="float-right" @click="toggleChat" />
-      </div>
-      <q-separator />
+  <!-- Chat Drawer -->
+  <q-drawer v-model="chatDrawerOpen" side="right" :width="350" bordered class="drawer-style">
+    <!-- Chat Header -->
+    <div class="q-pa-md drawer-header">
+      <h5>Chat mit GPT</h5>
+      <q-btn flat dense icon="close" class="float-right" @click="toggleChat" />
+    </div>
+    <q-separator />
 
-      <!-- Chat-Verlauf -->
-      <div class="q-pa-md chat-messages">
+    <!-- Chat-Verlauf -->
+    <div class="q-pa-md chat-messages">
       <div v-for="(msg, index) in chatMessages" :key="index" class="chat-message">
         <div :class="['message', msg.role === 'gpt' ? 'left' : 'right']">
           <p>{{ msg.text }}</p>
@@ -102,29 +90,28 @@
       </div>
     </div>
 
-
-      <!-- Eingabezeile -->
-      <q-separator />
-      <div class="q-pa-md chat-input">
-        <q-input
-          v-model="userMessage"
-          placeholder="Nachricht eingeben..."
-          dense
-          outlined
-          @keyup.enter="sendMessage"
-        >
-          <template v-slot:append>
-            <q-btn flat icon="send" color="primary" @click="sendMessage" />
-          </template>
-        </q-input>
-      </div>
-    </q-drawer>
+    <!-- Eingabezeile -->
+    <q-separator />
+    <div class="q-pa-md chat-input">
+      <q-input
+        v-model="userMessage"
+        placeholder="Nachricht eingeben..."
+        dense
+        outlined
+        @keyup.enter="sendMessage"
+      >
+        <template v-slot:append>
+          <q-btn flat icon="send" color="primary" @click="sendMessage" />
+        </template>
+      </q-input>
+    </div>
+  </q-drawer>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, onBeforeUnmount, defineProps } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { api } from 'boot/axios';
+import { ref, onMounted, watch, onBeforeUnmount, defineProps } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { api } from 'boot/axios'
 import {
   Chart,
   LineController,
@@ -136,7 +123,7 @@ import {
   CategoryScale,
   Title,
   Tooltip,
-} from 'chart.js';
+} from 'chart.js'
 
 // Registriere die notwendigen Chart.js-Komponenten
 Chart.register(
@@ -148,69 +135,68 @@ Chart.register(
   LinearScale,
   CategoryScale,
   Title,
-  Tooltip
-);
+  Tooltip,
+)
 
 defineProps({
   id: {
     type: String,
     required: false, // Falls `id` nicht zwingend erforderlich ist
   },
-});
+})
 // Floating Button und Drawer-Status
-const chatDrawerOpen = ref(false);
+const chatDrawerOpen = ref(false)
 
 // Chat-Verlauf und Eingabe
-const chatMessages = ref([
-  { role: "gpt", text: "Willkommen! Wie kann ich dir helfen?" },
-]);
-const userMessage = ref("");
+const chatMessages = ref([{ role: 'gpt', text: 'Willkommen! Wie kann ich dir helfen?' }])
+const userMessage = ref('')
 
 // Toggle für den Chat Drawer
 const toggleChat = () => {
-  chatDrawerOpen.value = !chatDrawerOpen.value;
-};
+  chatDrawerOpen.value = !chatDrawerOpen.value
+}
 
 // Nachricht senden
 const sendMessage = async () => {
-  if (!userMessage.value.trim()) return;
+  if (!userMessage.value.trim()) return
 
   // Nachricht des Benutzers hinzufügen
-  chatMessages.value.push({ role: "user", text: userMessage.value });
+  chatMessages.value.push({ role: 'user', text: userMessage.value })
 
-  const userInput = userMessage.value;
-  userMessage.value = ""; // Eingabefeld leeren
+  const userInput = userMessage.value
+  userMessage.value = '' // Eingabefeld leeren
 
-    // "GPT schreibt..." Nachricht hinzufügen
-    const typingIndicator = { role: "gpt", text: "GPT schreibt..." };
-  chatMessages.value.push(typingIndicator);
-  scrollToBottom();
+  // "GPT schreibt..." Nachricht hinzufügen
+  const typingIndicator = { role: 'gpt', text: 'GPT schreibt...' }
+  chatMessages.value.push(typingIndicator)
+  scrollToBottom()
 
   try {
     // Anfrage an Backend senden
-    const response = await api.post("/chat/", { message: userInput,
-      system_message: "Bitte antworte immer auf Deutsch.",
-     });
+    const response = await api.post('/chat/', {
+      message: userInput,
+      system_message: 'Bitte antworte immer auf Deutsch.',
+    })
 
     // GPT-Antwort hinzufügen
-    const gptReply = response.data.reply;
-    chatMessages.value.pop(); // Entferne "GPT schreibt..." Nachricht
-    chatMessages.value.push({ role: "gpt", text: gptReply });
-    scrollToBottom();
+    const gptReply = response.data.reply
+    chatMessages.value.pop() // Entferne "GPT schreibt..." Nachricht
+    chatMessages.value.push({ role: 'gpt', text: gptReply })
+    scrollToBottom()
   } catch (error) {
-    console.error("Fehler beim Abrufen der GPT-Antwort:", error);
+    console.error('Fehler beim Abrufen der GPT-Antwort:', error)
     // "GPT schreibt..." Nachricht entfernen
-    chatMessages.value.pop();
-    chatMessages.value.push({ role: "gpt", text: "Entschuldigung, etwas ist schiefgelaufen." });
-    scrollToBottom();
+    chatMessages.value.pop()
+    chatMessages.value.push({ role: 'gpt', text: 'Entschuldigung, etwas ist schiefgelaufen.' })
+    scrollToBottom()
   }
-};
+}
 
 // Automatisches Scrollen zum letzten Chat
 const scrollToBottom = () => {
-  const chatBox = document.querySelector(".chat-messages");
-  if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
-};
+  const chatBox = document.querySelector('.chat-messages')
+  if (chatBox) chatBox.scrollTop = chatBox.scrollHeight
+}
 
 const field = ref({
   id: 0,
@@ -219,27 +205,63 @@ const field = ref({
   created_at: '',
   saat__name: null,
   health_score: null,
-});
+})
 
 interface Measurement {
-  id: number;
-  created_at: string;
-  temperature: number;
-  humidity: number;
-  soil_moisture: number;
-  nutrients_level: number;
-  health_score: number;
+  id: number
+  created_at: string
+  temperature: number
+  humidity: number
+  soil_moisture: number
+  nutrients_level: number
+  health_score: number
 }
 
-const measurements = ref<Measurement[]>([]);
+const measurements = ref<Measurement[]>([])
 const columns = [
-  { name: 'created_at', label: 'Datum', align: 'left' as const, field: 'created_at', sortable: true },
-  { name: 'temperature', label: 'Temperatur (°C)', align: 'right' as const, field: 'temperature', sortable: true },
-  { name: 'humidity', label: 'Luftfeuchtigkeit (%)', align: 'right' as const, field: 'humidity', sortable: true },
-  { name: 'soil_moisture', label: 'Bodenfeuchte (%)', align: 'right' as const, field: 'soil_moisture', sortable: true },
-  { name: 'nutrients_level', label: 'Nährstoffe', align: 'right' as const, field: 'nutrients_level', sortable: true },
-  { name: 'health_score', label: 'Health Score', align: 'right' as const, field: 'health_score', sortable: true },
-];
+  {
+    name: 'created_at',
+    label: 'Datum',
+    align: 'left' as const,
+    field: 'created_at',
+    sortable: true,
+  },
+  {
+    name: 'temperature',
+    label: 'Temperatur (°C)',
+    align: 'right' as const,
+    field: 'temperature',
+    sortable: true,
+  },
+  {
+    name: 'humidity',
+    label: 'Luftfeuchtigkeit (%)',
+    align: 'right' as const,
+    field: 'humidity',
+    sortable: true,
+  },
+  {
+    name: 'soil_moisture',
+    label: 'Bodenfeuchte (%)',
+    align: 'right' as const,
+    field: 'soil_moisture',
+    sortable: true,
+  },
+  {
+    name: 'nutrients_level',
+    label: 'Nährstoffe',
+    align: 'right' as const,
+    field: 'nutrients_level',
+    sortable: true,
+  },
+  {
+    name: 'health_score',
+    label: 'Health Score',
+    align: 'right' as const,
+    field: 'health_score',
+    sortable: true,
+  },
+]
 
 // Dropdown-Optionen für Diagramme
 const chartOptions = [
@@ -248,79 +270,77 @@ const chartOptions = [
   { label: 'Bodenfeuchte (%)', value: 'soil_moisture' },
   { label: 'Nährstoffe', value: 'nutrients_level' },
   { label: 'Health Score', value: 'health_score' },
-];
-
+]
 
 // Standardauswahl
-const selectedLineData = ref(chartOptions[0]); // Standard: Temperatur
-const selectedBarData = ref(chartOptions[4]);  // Standard: Health Score
+const selectedLineData = ref(chartOptions[0]) // Standard: Temperatur
+const selectedBarData = ref(chartOptions[4]) // Standard: Health Score
 
+let lineChart: Chart | null = null
+let barChart: Chart | null = null
 
-let lineChart: Chart | null = null;
-let barChart: Chart | null = null;
-
-const route = useRoute();
-const router = useRouter();
-const fieldId = String(route.params.id);
+const route = useRoute()
+const router = useRouter()
+const fieldId = String(route.params.id)
 
 const fetchFieldDetails = async () => {
   try {
-    const response = await api.get(`/fields/${fieldId}/`);
-    field.value = response.data;
+    const response = await api.get(`/fields/${fieldId}/`)
+    field.value = response.data
   } catch (error) {
-    console.error('Fehler beim Abrufen der Felddetails:', error);
-    await router.push('/fields');
+    console.error('Fehler beim Abrufen der Felddetails:', error)
+    await router.push('/fields')
   }
-};
+}
 
 const fetchMeasurements = async () => {
   try {
-    const response = await api.get(`/fields/${fieldId}/measurements/`);
-    measurements.value = response.data;
-    console.log('Fetched Measurements:', measurements.value); // Log die rohen Messwerte
-    renderCharts(); // Initialisiere die Diagramme
+    const response = await api.get(`/fields/${fieldId}/measurements/`)
+    measurements.value = response.data
+    console.log('Fetched Measurements:', measurements.value) // Log die rohen Messwerte
+    renderCharts() // Initialisiere die Diagramme
   } catch (error) {
-    console.error('Fehler beim Abrufen der Messwerte:', error);
+    console.error('Fehler beim Abrufen der Messwerte:', error)
   }
-};
+}
 
 const renderCharts = () => {
-  const lineCanvas = document.getElementById('lineChart') as HTMLCanvasElement | null;
-  const barCanvas = document.getElementById('barChart') as HTMLCanvasElement | null;
+  const lineCanvas = document.getElementById('lineChart') as HTMLCanvasElement | null
+  const barCanvas = document.getElementById('barChart') as HTMLCanvasElement | null
 
-  const labels = measurements.value.map(m => new Date(m.created_at).toLocaleDateString());
+  const labels = measurements.value.map((m) => new Date(m.created_at).toLocaleDateString())
 
-  const lineData = measurements.value.map(m => {
-    const key = selectedLineData.value?.value as keyof Measurement;
+  const lineData = measurements.value.map((m) => {
+    const key = selectedLineData.value?.value as keyof Measurement
     if (!Object.keys(m).includes(key)) {
-      console.error(`Invalid key "${key}" for line chart`);
-      return 0;
+      console.error(`Invalid key "${key}" for line chart`)
+      return 0
     }
-    return m[key] as number || 0;
-  });
+    return (m[key] as number) || 0
+  })
 
-  const barData = measurements.value.map(m => {
-    const key = selectedBarData.value?.value as keyof Measurement;
+  const barData = measurements.value.map((m) => {
+    const key = selectedBarData.value?.value as keyof Measurement
     if (!Object.keys(m).includes(key)) {
-      console.error(`Invalid key "${key}" for bar chart`);
-      return 0;
+      console.error(`Invalid key "${key}" for bar chart`)
+      return 0
     }
-    return m[key] as number || 0;
-  });
+    return (m[key] as number) || 0
+  })
 
-  console.log('Chart Labels:', labels);
-  console.log('Line Chart Data:', lineData);
-  console.log('Bar Chart Data:', barData);
+  console.log('Chart Labels:', labels)
+  console.log('Line Chart Data:', lineData)
+  console.log('Bar Chart Data:', barData)
 
   if (lineCanvas) {
-    if (lineChart) lineChart.destroy();
+    if (lineChart) lineChart.destroy()
     lineChart = new Chart(lineCanvas.getContext('2d')!, {
       type: 'line',
       data: {
         labels,
         datasets: [
           {
-            label: chartOptions.find(o => o.value === selectedLineData.value?.value)?.label || '',
+            label: chartOptions.find((o) => o.value === selectedLineData.value?.value)?.label || '',
             data: lineData,
             borderColor: 'rgba(75, 192, 192, 1)',
             borderWidth: 2,
@@ -328,52 +348,51 @@ const renderCharts = () => {
           },
         ],
       },
-    });
+    })
   }
 
   if (barCanvas) {
-    if (barChart) barChart.destroy();
+    if (barChart) barChart.destroy()
     barChart = new Chart(barCanvas.getContext('2d')!, {
       type: 'bar',
       data: {
         labels,
         datasets: [
           {
-            label: chartOptions.find(o => o.value === selectedBarData.value?.value)?.label || '',
+            label: chartOptions.find((o) => o.value === selectedBarData.value?.value)?.label || '',
             data: barData,
             backgroundColor: 'rgba(153, 102, 255, 0.6)',
             borderWidth: 1,
           },
         ],
       },
-    });
+    })
   }
-};
+}
 
 // Watcher aktualisiert Diagramme bei Auswahländerung
 watch([selectedLineData, selectedBarData], () => {
-  console.log('Selected Line Data:', selectedLineData.value); // Debugging
-  console.log('Selected Bar Data:', selectedBarData.value); // Debugging
-  renderCharts();
-});
+  console.log('Selected Line Data:', selectedLineData.value) // Debugging
+  console.log('Selected Bar Data:', selectedBarData.value) // Debugging
+  renderCharts()
+})
 
 // Cleanup bei Entladen der Komponente
 onBeforeUnmount(() => {
-  if (lineChart) lineChart.destroy();
-  if (barChart) barChart.destroy();
-});
+  if (lineChart) lineChart.destroy()
+  if (barChart) barChart.destroy()
+})
 
 const goBack = async () => {
-  await router.push('/fields');
-};
+  await router.push('/fields')
+}
 
 // Initialisierung
 onMounted(async () => {
-  await fetchFieldDetails();
-  await fetchMeasurements();
-});
+  await fetchFieldDetails()
+  await fetchMeasurements()
+})
 </script>
-
 
 <style>
 .q-page {
@@ -444,7 +463,6 @@ onMounted(async () => {
   box-sizing: border-box;
   z-index: 1100; /* Stelle sicher, dass der Drawer über dem Inhalt liegt */
 }
-
 
 .drawer-header {
   display: flex;

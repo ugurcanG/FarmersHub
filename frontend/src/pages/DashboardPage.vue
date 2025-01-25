@@ -2,7 +2,8 @@
   <q-page class="q-pa-md">
     <h1 class="text-h4 text-left">Dashboard</h1>
     <p class="text-body1">
-      Willkommen beim Farmers Hub Dashboard! Hier findest du alle wichtigen Informationen auf einen Blick.
+      Willkommen beim Farmers Hub Dashboard! Hier findest du alle wichtigen Informationen auf einen
+      Blick.
     </p>
     <div class="row q-col-gutter-lg">
       <div class="col-12 col-sm-6 col-md-4">
@@ -31,21 +32,21 @@
 </template>
 
 <script setup lang="ts">
-import Card from 'src/components/BaseCard.vue';
-import Button from 'src/components/BaseButton.vue';
-import { useRouter } from 'vue-router';
+import Card from 'src/components/BaseCard.vue'
+import Button from 'src/components/BaseButton.vue'
+import { useRouter } from 'vue-router'
 
-const router = useRouter();
+const router = useRouter()
 
 const goToFields = () => {
-  void router.push('/fields');
-};
+  void router.push('/fields')
+}
 
 const goToEmployees = () => {
-  void router.push('/employees');
-};
+  void router.push('/employees')
+}
 
 const goToMachines = () => {
-  void router.push('/machines');
-};
+  void router.push('/machines')
+}
 </script>

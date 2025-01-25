@@ -16,47 +16,47 @@
 </template>
 
 <script setup lang="ts">
-import type { QBtnProps } from "quasar";
-import type { PropType } from "vue";
+import type { QBtnProps } from 'quasar'
+import type { PropType } from 'vue'
 
 defineProps({
   label: {
     type: String as PropType<string>,
-    default: ""
+    default: '',
   },
   color: {
     type: String as PropType<string>,
-    default: "primary"
+    default: 'primary',
   },
   icon: {
     type: String as PropType<string>,
-    default: ""
+    default: '',
   },
   unelevated: {
     type: Boolean as PropType<boolean>,
-    default: false
+    default: false,
   },
   flat: {
     type: Boolean as PropType<boolean>,
-    default: false
+    default: false,
   },
   rounded: {
     type: Boolean as PropType<boolean>,
-    default: true
+    default: true,
   },
   dense: {
     type: Boolean as PropType<boolean>,
-    default: false
+    default: false,
   },
   onClick: {
-    type: Function as PropType<QBtnProps["onClick"]>,
-    default: undefined
+    type: Function as PropType<QBtnProps['onClick']>,
+    default: undefined,
   },
   props: {
     type: Object as PropType<Record<string, unknown>>,
-    default: () => ({})
-  }
-});
+    default: () => ({}),
+  },
+})
 </script>
 
 <style lang="scss">

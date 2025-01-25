@@ -34,10 +34,10 @@
 
 <script setup lang="ts">
 defineProps({
-  title: { type: String, default: "" },
-  content: { type: String, default: "" },
-  backgroundColor: { type: String, default: "var(--q-primary)" },
-});
+  title: { type: String, default: '' },
+  content: { type: String, default: '' },
+  backgroundColor: { type: String, default: 'var(--q-primary)' },
+})
 </script>
 
 <style lang="scss">
