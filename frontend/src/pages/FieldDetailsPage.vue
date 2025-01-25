@@ -1,5 +1,5 @@
 <template>
-  <q-page class="q-pa-md">
+  <q-page class="q-pa-md" :class="{ 'page-with-drawer': chatDrawerOpen }">
     <!-- Basisdetails -->
     <q-card class="q-pa-md shadow-2">
       <q-card-section>
@@ -67,11 +67,62 @@
         </div>
       </q-card-section>
     </q-card>
+        <!-- Floating Button -->
+        <q-btn
+      v-if="!chatDrawerOpen"
+      round
+      glossy
+      icon="chat"
+      color="primary"
+      class="chat-fab"
+      @click="toggleChat"
+    />
   </q-page>
+      <!-- Chat Drawer -->
+      <q-drawer
+      v-model="chatDrawerOpen"
+      side="right"
+      :width="350"
+      bordered
+      class="drawer-style"
+    >
+      <!-- Chat Header -->
+      <div class="q-pa-md drawer-header">
+        <h5>Chat mit GPT</h5>
+        <q-btn flat dense icon="close" class="float-right" @click="toggleChat" />
+      </div>
+      <q-separator />
+
+      <!-- Chat-Verlauf -->
+      <div class="q-pa-md chat-messages">
+      <div v-for="(msg, index) in chatMessages" :key="index" class="chat-message">
+        <div :class="['message', msg.role === 'gpt' ? 'left' : 'right']">
+          <p>{{ msg.text }}</p>
+        </div>
+      </div>
+    </div>
+
+
+      <!-- Eingabezeile -->
+      <q-separator />
+      <div class="q-pa-md chat-input">
+        <q-input
+          v-model="userMessage"
+          placeholder="Nachricht eingeben..."
+          dense
+          outlined
+          @keyup.enter="sendMessage"
+        >
+          <template v-slot:append>
+            <q-btn flat icon="send" color="primary" @click="sendMessage" />
+          </template>
+        </q-input>
+      </div>
+    </q-drawer>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, onBeforeUnmount } from 'vue';
+import { ref, onMounted, watch, onBeforeUnmount, defineProps } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { api } from 'boot/axios';
 import {
@@ -99,6 +150,48 @@ Chart.register(
   Title,
   Tooltip
 );
+
+defineProps({
+  id: {
+    type: String,
+    required: false, // Falls `id` nicht zwingend erforderlich ist
+  },
+});
+// Floating Button und Drawer-Status
+const chatDrawerOpen = ref(false);
+
+// Chat-Verlauf und Eingabe
+const chatMessages = ref([
+  { role: "gpt", text: "Willkommen! Wie kann ich dir helfen?" },
+]);
+const userMessage = ref("");
+
+// Toggle für den Chat Drawer
+const toggleChat = () => {
+  chatDrawerOpen.value = !chatDrawerOpen.value;
+};
+
+// Nachricht senden
+const sendMessage = () => {
+  if (!userMessage.value.trim()) return;
+
+  // Füge die Nachricht des Users hinzu
+  chatMessages.value.push({ role: "user", text: userMessage.value });
+
+  // Simuliere eine GPT-Antwort
+  setTimeout(() => {
+    chatMessages.value.push({ role: "gpt", text: "Das ist eine Testantwort von GPT." });
+    scrollToBottom();
+  }, 500);
+
+  userMessage.value = ""; // Eingabefeld leeren
+};
+
+// Automatisches Scrollen zum letzten Chat
+const scrollToBottom = () => {
+  const chatBox = document.querySelector(".chat-messages");
+  if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+};
 
 const field = ref({
   id: 0,
@@ -261,3 +354,82 @@ onMounted(async () => {
   await fetchMeasurements();
 });
 </script>
+
+
+<style>
+.q-page {
+  position: relative;
+  overflow-x: hidden; /* Keine horizontale Überlappung zulassen */
+}
+.q-pa-md {
+  transition: margin-right 0.3s ease;
+  overflow: hidden; /* Verhindert, dass Inhalte über den Rand hinausgehen */
+}
+/* Floating Button */
+.chat-fab {
+  position: fixed;
+  bottom: 80px;
+  right: 16px;
+  z-index: 10000;
+}
+
+/* Chat Drawer Styles */
+.chat-messages {
+  flex: 1; /* Nimmt den verbleibenden Platz ein */
+  overflow-y: auto; /* Ermöglicht Scrollen bei Bedarf */
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Abstand zwischen den Nachrichten */
+}
+
+.message {
+  padding: 12px 16px;
+  border-radius: 12px;
+  max-width: 75%;
+  word-wrap: break-word;
+}
+
+.message.left {
+  background-color: #f1f1f1;
+  align-self: flex-start;
+}
+
+.message.right {
+  background-color: #e0f7fa;
+  align-self: flex-end;
+  margin-left: auto;
+}
+.chat-input {
+  position: sticky; /* Behält die Position relativ zum Drawer */
+  bottom: 0; /* Am unteren Rand */
+  padding: 16px;
+  background: #fff; /* Hintergrundfarbe, um Nachrichten zu überdecken */
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1); /* Leichter Schatten für Trennung */
+  z-index: 1; /* Sicherstellen, dass es über den Nachrichten bleibt */
+}
+
+.page-with-drawer {
+  transition: margin-right 0.3s ease;
+}
+
+.drawer-style {
+  position: fixed; /* Ändere zu fixed, um den Drawer auf die Seite zu zwingen */
+  top: 0; /* Startet oben */
+  right: 0; /* An der rechten Seite */
+  height: 100vh; /* Deckt die gesamte Höhe ab */
+  width: 250px; /* Breite des Drawers */
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  z-index: 1100; /* Stelle sicher, dass der Drawer über dem Inhalt liegt */
+}
+
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+</style>
