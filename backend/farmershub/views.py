@@ -1,5 +1,5 @@
 import json
-import openai
+from openai import OpenAI
 from threading import Thread
 from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
@@ -23,7 +23,7 @@ def view_helloworld(request):
     test_data = Seed.objects.all().values()
     data = Seed.objects.all()
     serialized_data = serializers.serialize('json', list(data))
-    
+
     return HttpResponse(serialized_data)
 
 
@@ -32,7 +32,7 @@ def start_field_measurement_population(request):
     try:
         field_id = int(request.GET.get('id'))
         field_obj = Field.objects.get(id=field_id)
-    
+
         measurement_thread = Thread(target=simulation.populate_field_measurements, args=(field_obj,))
         measurement_thread.start()
 
@@ -46,24 +46,24 @@ def get_field_health_index(request):
     max_diff_humidity = 15
     max_diff_soil_moisture = 10
     max_diff_nutrient_level = 50
-    
+
     try:
         field_id = int(request.GET.get('id'))
         field_obj = Field.objects.get(id=field_id)
         field_size = field_obj.width * field_obj.height
-        
+
         field_measurements = FieldMeasurement.objects.all().order_by('-id')[:field_size]
         seed_obj = Seed.objects.get(id=field_obj.saat_id)
-        
+
         data = []
         health_score = float(field_size * 4)
-        
+
         for measurement in field_measurements:
             diff_temperature = measurement.temperature - seed_obj.pref_temperature
             diff_humidity = measurement.humidity - seed_obj.pref_humidity
             diff_soil_moisture = measurement.soil_moisture - seed_obj.pref_soil_moisture
             diff_nutrient_level = measurement.nutrients_level - seed_obj.pref_nutrient_level
-            
+
             if max_diff_temperature < diff_temperature or diff_temperature < -max_diff_temperature:
                 data.append(['WARNING temperature', measurement.temperature, seed_obj.pref_temperature])
                 health_score -= 1
@@ -76,7 +76,7 @@ def get_field_health_index(request):
             if max_diff_nutrient_level < diff_nutrient_level or diff_nutrient_level < -max_diff_nutrient_level:
                 data.append(['WARNING nutrients_level', measurement.nutrients_level, seed_obj.pref_nutrient_level])
                 health_score -= 1
-        
+
         data_dict = {
             "field_size": field_size,
             "health_score": f"{health_score}/{field_size * 4}",
@@ -84,7 +84,7 @@ def get_field_health_index(request):
         }
 
         serialized_data = json.dumps(data_dict)
-        
+
         return HttpResponse(serialized_data, status=200)
     except (ValueError, TypeError):
         return HttpResponse("id not valid")
@@ -130,13 +130,13 @@ def get_fields(request):
         return JsonResponse({"error": str(e)}, status=500)
 
 
-    
+
 # http://127.0.0.1:8000/fields/add/
 @csrf_exempt
 def add_field(request):
     if request.method == "POST":
         data = json.loads(request.body.decode('utf-8'))
-        
+
         # Hole die Werte aus dem Request
         name = data.get("name")
         width = data.get("width")
@@ -247,12 +247,12 @@ def get_field_details(request, field_id):
         return JsonResponse(data, safe=False)
     except Field.DoesNotExist:
         return JsonResponse({"error": "Feld nicht gefunden"}, status=404)
-    
+
 def get_field_measurements(request, field_id):
     try:
         # Hole alle Messwerte für das gegebene Feld
         measurements = FieldMeasurement.objects.filter(field_id=field_id).order_by('created_at')
-        
+
         # Konvertiere die Daten in eine Liste von Dictionaries
         measurement_list = [
             {
@@ -266,15 +266,15 @@ def get_field_measurements(request, field_id):
             }
             for measurement in measurements
         ]
-        
+
         return JsonResponse(measurement_list, safe=False, status=200)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
 
-# Setze den OpenAI API Key
-openai.api_key = settings.OPENAI_API_KEY
-if not openai.api_key:
-    raise ValueError("OpenAI API-Schlüssel ist nicht gesetzt!")
+
+
+
+client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
 # http://127.0.0.1:8000/chat/
 @csrf_exempt
@@ -290,8 +290,8 @@ def chat_with_gpt(request):
                 return JsonResponse({"error": "Nachricht fehlt"}, status=400)
 
             # Anfrage an OpenAI senden
-            response = openai.ChatCompletion(
-                model="gpt-4",
+            response = client.chat.completions.create(
+                model="gpt-4",  # oder gpt-3.5-turbo
                 messages=[
                     {"role": "system", "content": "You are a helpful assistant."},
                     {"role": "user", "content": user_message}
