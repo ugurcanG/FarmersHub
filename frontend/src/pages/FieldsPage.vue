@@ -8,7 +8,16 @@
         v-for="(field, index) in fields"
         :key="field.id"
       >
-        <Card :title="field.name ">
+      <Card>
+          <template #title>
+            <!-- Klickbarer Link -->
+            <router-link
+              :to="`/fields/${field.id}`"
+              class="text-primary-style text-decoration-none"
+            >
+              {{ field.name }}
+            </router-link>
+          </template>
           <template #content>
             <div class="content-container">
               <p>Größe: {{ field.size }} ha</p>
@@ -232,5 +241,16 @@ onMounted(fetchFields);
   margin: 0;
   padding: 0.5rem;
   border-radius: 4px;
+}
+
+a.text-primary-style {
+  color: white; /* Quasar Primärfarbe */
+  text-decoration: none; /* Entfernt Unterstrich */
+  font-weight: bold; /* Fettschrift */
+  font-size: large;
+}
+
+a.text-primary-style:hover {
+  text-decoration: underline; /* Unterstrich beim Hover */
 }
 </style>

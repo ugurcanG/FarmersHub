@@ -226,3 +226,19 @@ def update_field(request, field_id):
         except ValueError:
             return JsonResponse({"error": "Ungültige Daten"}, status=400)
     return JsonResponse({"error": "Ungültige Anfrage"}, status=400)
+
+
+def get_field_details(request, field_id):
+    try:
+        field = Field.objects.get(id=field_id)
+        data = {
+            "id": field.id,
+            "name": field.name,
+            "size": field.width * field.height,
+            "created_at": field.created_at,
+            "saat__name": field.saat.name if field.saat else None,
+            "health_score": FieldMeasurement.objects.filter(field=field).aggregate(models.Avg('health_score'))['health_score__avg'] or 0
+        }
+        return JsonResponse(data, safe=False)
+    except Field.DoesNotExist:
+        return JsonResponse({"error": "Feld nicht gefunden"}, status=404)
