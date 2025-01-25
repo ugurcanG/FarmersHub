@@ -92,3 +92,5 @@ def populate_field_measurements(field: Field):
             measurement.save()
 
             current_datetime += datetime.timedelta(seconds=5)
+            # für präsentation vielleicht wichtig um live daten erfassung zu simulieren
+            # time.sleep(5)

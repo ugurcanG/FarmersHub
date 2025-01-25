@@ -181,16 +181,26 @@ const sendMessage = async () => {
   const userInput = userMessage.value;
   userMessage.value = ""; // Eingabefeld leeren
 
+    // "GPT schreibt..." Nachricht hinzufügen
+    const typingIndicator = { role: "gpt", text: "GPT schreibt..." };
+  chatMessages.value.push(typingIndicator);
+  scrollToBottom();
+
   try {
     // Anfrage an Backend senden
-    const response = await api.post("/chat/", { message: userInput });
+    const response = await api.post("/chat/", { message: userInput,
+      system_message: "Bitte antworte immer auf Deutsch.",
+     });
 
     // GPT-Antwort hinzufügen
     const gptReply = response.data.reply;
+    chatMessages.value.pop(); // Entferne "GPT schreibt..." Nachricht
     chatMessages.value.push({ role: "gpt", text: gptReply });
     scrollToBottom();
   } catch (error) {
     console.error("Fehler beim Abrufen der GPT-Antwort:", error);
+    // "GPT schreibt..." Nachricht entfernen
+    chatMessages.value.pop();
     chatMessages.value.push({ role: "gpt", text: "Entschuldigung, etwas ist schiefgelaufen." });
     scrollToBottom();
   }

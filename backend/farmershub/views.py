@@ -291,9 +291,9 @@ def chat_with_gpt(request):
 
             # Anfrage an OpenAI senden
             response = client.chat.completions.create(
-                model="gpt-4",  # oder gpt-3.5-turbo
+                model="gpt-4o-mini",
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "system", "content": "Bitte antworte immer auf Deutsch."},
                     {"role": "user", "content": user_message}
                 ]
             )
