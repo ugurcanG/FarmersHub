@@ -30,4 +30,5 @@ urlpatterns = [
     path('fields/update/<int:field_id>/', views.update_field, name='update-field'),
     path('fields/<int:field_id>/', views.get_field_details, name='get-field-details'),
     path('fields/<int:field_id>/measurements/', views.get_field_measurements, name='get-field-measurements'),
+    path('chat/', views.chat_with_gpt, name='chat-with-gpt'),
 ]

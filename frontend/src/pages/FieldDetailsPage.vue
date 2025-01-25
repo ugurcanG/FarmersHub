@@ -172,19 +172,28 @@ const toggleChat = () => {
 };
 
 // Nachricht senden
-const sendMessage = () => {
+const sendMessage = async () => {
   if (!userMessage.value.trim()) return;
 
-  // Füge die Nachricht des Users hinzu
+  // Nachricht des Benutzers hinzufügen
   chatMessages.value.push({ role: "user", text: userMessage.value });
 
-  // Simuliere eine GPT-Antwort
-  setTimeout(() => {
-    chatMessages.value.push({ role: "gpt", text: "Das ist eine Testantwort von GPT." });
-    scrollToBottom();
-  }, 500);
-
+  const userInput = userMessage.value;
   userMessage.value = ""; // Eingabefeld leeren
+
+  try {
+    // Anfrage an Backend senden
+    const response = await api.post("/chat/", { message: userInput });
+
+    // GPT-Antwort hinzufügen
+    const gptReply = response.data.reply;
+    chatMessages.value.push({ role: "gpt", text: gptReply });
+    scrollToBottom();
+  } catch (error) {
+    console.error("Fehler beim Abrufen der GPT-Antwort:", error);
+    chatMessages.value.push({ role: "gpt", text: "Entschuldigung, etwas ist schiefgelaufen." });
+    scrollToBottom();
+  }
 };
 
 // Automatisches Scrollen zum letzten Chat

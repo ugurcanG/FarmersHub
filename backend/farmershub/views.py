@@ -1,5 +1,5 @@
 import json
-
+import openai
 from threading import Thread
 from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
@@ -7,6 +7,11 @@ from django.core import serializers
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.db import models
+from django.conf import settings
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 
 from . import simulation
@@ -265,3 +270,40 @@ def get_field_measurements(request, field_id):
         return JsonResponse(measurement_list, safe=False, status=200)
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+# Setze den OpenAI API Key
+openai.api_key = settings.OPENAI_API_KEY
+if not openai.api_key:
+    raise ValueError("OpenAI API-Schlüssel ist nicht gesetzt!")
+
+# http://127.0.0.1:8000/chat/
+@csrf_exempt
+def chat_with_gpt(request):
+    if request.method == "POST":
+        try:
+            # Anfrage-Daten parsen
+            data = json.loads(request.body)
+            user_message = data.get("message", "")
+
+            if not user_message:
+                logger.error("Nachricht fehlt")
+                return JsonResponse({"error": "Nachricht fehlt"}, status=400)
+
+            # Anfrage an OpenAI senden
+            response = openai.ChatCompletion(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": user_message}
+                ]
+            )
+
+            # Antwort extrahieren
+            gpt_reply = response.choices[0].message.content
+            return JsonResponse({"reply": gpt_reply}, status=200)
+
+        except Exception as e:
+            logger.exception("Fehler in der Funktion chat_with_gpt:")
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Ungültige Anfrage"}, status=400)
