@@ -19,13 +19,9 @@ from .models import Seed, Field, FieldMeasurement
 
 
 # http://127.0.0.1:8000/helloworld/
-def view_helloworld(request):
-    test_data = Seed.objects.all().values()
-    data = Seed.objects.all()
-    serialized_data = serializers.serialize('json', list(data))
-
-    return HttpResponse(serialized_data)
-
+def get_seeds(request):
+    seeds = Seed.objects.all().values('id', 'name')
+    return JsonResponse(list(seeds), safe=False)
 
 # http://127.0.0.1:8000/measurements/?id=2
 def start_field_measurement_population(request):

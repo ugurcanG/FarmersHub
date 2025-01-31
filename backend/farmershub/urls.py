@@ -21,7 +21,6 @@ from . import views
 
 
 urlpatterns = [
-	path('helloworld/', views.view_helloworld),
 	path('measurements/', views.start_field_measurement_population),
 	path('test/', views.get_field_health_index),
 
@@ -42,4 +41,7 @@ urlpatterns = [
     path('machines/<int:machine_id>/', views.get_machine_details, name='get_machine_details'),
     path('machines/update/<int:machine_id>/', views.update_machine, name='update_machine'),
     path('machines/delete/<int:machine_id>/', views.delete_machine, name='delete_machine'),
+
+    # Saatgut-URLs
+    path('seeds/', views.get_seeds, name='get_seeds'),
 ]
