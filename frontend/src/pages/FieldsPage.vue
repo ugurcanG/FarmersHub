@@ -46,7 +46,7 @@
           <template #image>
             <div
               :class="{
-                'bg-green-5': field.health_score !== null && field.health_score >= 3,
+                'bg-green-7': field.health_score !== null && field.health_score >= 3,
                 'bg-orange-5':
                   field.health_score !== null && field.health_score >= 2 && field.health_score < 3,
                 'bg-red-5': field.health_score !== null && field.health_score < 2,
