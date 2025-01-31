@@ -309,21 +309,31 @@ def chat_with_gpt(request):
     return JsonResponse({"error": "Ungültige Anfrage"}, status=400)
 
 from .models import Machine
-# Alle Maschinen abrufen
 def get_machines(request):
-    machines = Machine.objects.all().values()
+    machines = Machine.objects.all().values('id', 'name', 'status', 'category', 'image_url')
     return JsonResponse(list(machines), safe=False)
 
-# Eine neue Maschine hinzufügen
+# Neue Maschine hinzufügen
 @csrf_exempt
 def add_machine(request):
     if request.method == "POST":
         data = json.loads(request.body)
         machine = Machine.objects.create(
             name=data.get("name"),
-            status=data.get("status", "In Betrieb")
+            status=data.get("status", "In Betrieb"),
+            category=data.get("category", "Traktor"),
+            image_url=data.get("image_url")  # Bild-URL von Supabase speichern
         )
-        return JsonResponse({"message": "Maschine hinzugefügt", "machine": {"id": machine.id, "name": machine.name, "status": machine.status}}, status=201)
+        return JsonResponse({
+            "message": "Maschine hinzugefügt",
+            "machine": {
+                "id": machine.id,
+                "name": machine.name,
+                "status": machine.status,
+                "category": machine.category,
+                "image_url": machine.image_url
+            }
+        }, status=201)
 
 # Eine Maschine aktualisieren
 @csrf_exempt
@@ -337,8 +347,17 @@ def update_machine(request, machine_id):
         data = json.loads(request.body)
         machine.name = data.get("name", machine.name)
         machine.status = data.get("status", machine.status)
+        machine.category = data.get("category", machine.category)
         machine.save()
-        return JsonResponse({"message": "Maschine aktualisiert", "machine": {"id": machine.id, "name": machine.name, "status": machine.status}}, status=200)
+        return JsonResponse({
+            "message": "Maschine aktualisiert",
+            "machine": {
+                "id": machine.id,
+                "name": machine.name,
+                "status": machine.status,
+                "category": machine.category
+            }
+        }, status=200)
 
 # Eine Maschine löschen
 @csrf_exempt

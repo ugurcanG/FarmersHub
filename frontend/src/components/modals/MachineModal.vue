@@ -14,6 +14,12 @@
           label="Status"
           filled
         />
+        <q-select
+          v-model="machineData.category"
+          :options="categoryOptions"
+          label="Kategorie"
+          filled
+        />
       </q-card-section>
 
       <q-card-actions align="right">
@@ -32,7 +38,7 @@ const emit = defineEmits(['close', 'submit'])
 const { showModal, machineToEdit } = defineProps({
   showModal: Boolean,
   machineToEdit: {
-    type: Object as PropType<{ name: string; status: string } | null>,
+    type: Object as PropType<{ name: string; status: string; category: string } | null>,
     default: null,
   },
 })
@@ -45,10 +51,12 @@ const localShowModal = computed({
 })
 
 const statusOptions = ['In Betrieb', 'Wartung erforderlich', 'Defekt']
+const categoryOptions = ['Traktor', 'Mähdrescher', 'Anhänger', 'Zubehör', 'Saatmaschine']
 
 const machineData = ref({
   name: '',
   status: 'In Betrieb',
+  category: 'Traktor'
 })
 
 watch(
@@ -57,7 +65,7 @@ watch(
     if (newMachine) {
       machineData.value = { ...newMachine }
     } else {
-      machineData.value = { name: '', status: 'In Betrieb' }
+      machineData.value = { name: '', status: 'In Betrieb', category: 'Traktor' }
     }
   },
   { immediate: true }

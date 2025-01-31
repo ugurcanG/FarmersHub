@@ -50,9 +50,23 @@ class Seed(models.Model):
         db_table = 'seed'
 
 class Machine(models.Model):
+    MACHINE_CATEGORIES = [
+        ('Traktor', 'Traktor'),
+        ('Mähdrescher', 'Mähdrescher'),
+        ('Anhänger', 'Anhänger'),
+        ('Zubehör', 'Zubehör'),
+        ('Saatmaschine', 'Saatmaschine'),
+    ]
+
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255)
-    status = models.CharField(max_length=255, choices=[('In Betrieb', 'In Betrieb'), ('Wartung erforderlich', 'Wartung erforderlich'), ('Defekt', 'Defekt')], default='In Betrieb')
+    status = models.CharField(max_length=255, choices=[
+        ('In Betrieb', 'In Betrieb'),
+        ('Wartung erforderlich', 'Wartung erforderlich'),
+        ('Defekt', 'Defekt'),
+    ], default='In Betrieb')
+    category = models.CharField(max_length=50, choices=MACHINE_CATEGORIES, default='Traktor')
+    image_url = models.URLField(blank=True, null=True)  # Speichert die Supabase-Image-URL
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
