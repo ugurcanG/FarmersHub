@@ -8,12 +8,7 @@
 
       <q-card-section>
         <q-input v-model="machineData.name" label="Maschinenname" filled />
-        <q-select
-          v-model="machineData.status"
-          :options="statusOptions"
-          label="Status"
-          filled
-        />
+        <q-select v-model="machineData.status" :options="statusOptions" label="Status" filled />
         <q-select
           v-model="machineData.category"
           :options="categoryOptions"
@@ -24,7 +19,11 @@
 
       <q-card-actions align="right">
         <q-btn flat label="Abbrechen" @click="cancel" />
-        <q-btn color="primary" :label="machineToEdit ? 'Speichern' : 'Erstellen'" @click="submitMachine" />
+        <q-btn
+          color="primary"
+          :label="machineToEdit ? 'Speichern' : 'Erstellen'"
+          @click="submitMachine"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -56,7 +55,7 @@ const categoryOptions = ['Traktor', 'Mähdrescher', 'Anhänger', 'Zubehör', 'Sa
 const machineData = ref({
   name: '',
   status: 'In Betrieb',
-  category: 'Traktor'
+  category: 'Traktor',
 })
 
 watch(
@@ -68,7 +67,7 @@ watch(
       machineData.value = { name: '', status: 'In Betrieb', category: 'Traktor' }
     }
   },
-  { immediate: true }
+  { immediate: true },
 )
 
 const submitMachine = () => {

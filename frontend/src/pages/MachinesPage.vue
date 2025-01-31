@@ -3,7 +3,11 @@
     <h3 class="text-h5 text-dark">Maschinenverwaltung</h3>
     <div class="row q-col-gutter-lg">
       <!-- Maschinenliste -->
-      <div class="col-12 col-sm-6 col-md-4 text-white" v-for="(machine, index) in machines" :key="machine.id">
+      <div
+        class="col-12 col-sm-6 col-md-4 text-white"
+        v-for="(machine, index) in machines"
+        :key="machine.id"
+      >
         <Card>
           <template #title>
             {{ machine.name }}
@@ -13,9 +17,9 @@
               <div class="image-container">
                 <img :src="getMachineImage(machine.category)" class="machine-icon" />
               </div>
-            <p><strong>Status:</strong> {{ machine.status }}</p>
-            <p><strong>Kategorie:</strong> {{ machine.category }}</p>
-          </div>
+              <p><strong>Status:</strong> {{ machine.status }}</p>
+              <p><strong>Kategorie:</strong> {{ machine.category }}</p>
+            </div>
           </template>
           <template #icon>
             <q-btn flat dense round color="white" icon="more_vert" @click="toggleMenu(index)" />
@@ -38,7 +42,11 @@
         <Card>
           <template #content>
             <div class="flex flex-center">
-              <Button class="btn btn-flat text-dark rounded" color="white" @click="showAddMachineModal = true">
+              <Button
+                class="btn btn-flat text-dark rounded"
+                color="white"
+                @click="showAddMachineModal = true"
+              >
                 <i class="material-icons text-h5 text-dark">add</i>
               </Button>
             </div>
@@ -48,7 +56,11 @@
     </div>
 
     <!-- Modal für neue Maschine -->
-    <MachineModal :showModal="showAddMachineModal" @close="showAddMachineModal = false" @submit="addMachine" />
+    <MachineModal
+      :showModal="showAddMachineModal"
+      @close="showAddMachineModal = false"
+      @submit="addMachine"
+    />
 
     <!-- Modal für Maschinenbearbeitung -->
     <MachineModal
@@ -67,7 +79,12 @@
         <q-card-section> Bist du sicher, dass du diese Maschine löschen möchtest? </q-card-section>
         <q-card-actions align="right">
           <q-btn flat label="Abbrechen" color="primary" @click="showDeleteDialog = false" />
-          <q-btn flat label="Löschen" color="negative" @click="deleteMachine(selectedMachineIndex)" />
+          <q-btn
+            flat
+            label="Löschen"
+            color="negative"
+            @click="deleteMachine(selectedMachineIndex)"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -125,7 +142,11 @@ const closeEditModal = () => {
 }
 
 // Maschine aktualisieren
-const updateMachine = async (updatedMachine: { name: string; status: string; category: string }) => {
+const updateMachine = async (updatedMachine: {
+  name: string
+  status: string
+  category: string
+}) => {
   if (!machineToEdit.value) return
   try {
     await api.put(`/machines/update/${machineToEdit.value.id}/`, updatedMachine)
@@ -169,13 +190,21 @@ const addMachine = async (machineData: { name: string; status: string; category:
 // Maschinenbild basierend auf Kategorie abrufen
 const getMachineImage = (category: string) => {
   const images: { [key: string]: string } = {
-    "Traktor": "https://qbqnlcmndkrpwmdepmft.supabase.co/storage/v1/object/sign/machine-images/traktor.webp?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtYWNoaW5lLWltYWdlcy90cmFrdG9yLndlYnAiLCJpYXQiOjE3MzgzMzQwMjIsImV4cCI6MTc2OTg3MDAyMn0.mwb-ZBpCsQGaIYbhrcNfq9C6-yn_e_R9VS_ri6alE0M",
-    "Mähdrescher": "https://qbqnlcmndkrpwmdepmft.supabase.co/storage/v1/object/sign/machine-images/maehdrescher.jpeg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtYWNoaW5lLWltYWdlcy9tYWVoZHJlc2NoZXIuanBlZyIsImlhdCI6MTczODMzMzk5NiwiZXhwIjoxNzY5ODY5OTk2fQ.2kINjKF6WkIAqGDSnnKY0C8gR4HwBoih00kriB24gK0",
-    "Anhänger": "https://qbqnlcmndkrpwmdepmft.supabase.co/storage/v1/object/sign/machine-images/anhaenger.jpeg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtYWNoaW5lLWltYWdlcy9hbmhhZW5nZXIuanBlZyIsImlhdCI6MTczODMzMzk3NSwiZXhwIjoxNzY5ODY5OTc1fQ.oURIp8dyPg7wtBxTUQ7huABcyBfb5H6o5R5MivFYc9o",
-    "Zubehör": "https://qbqnlcmndkrpwmdepmft.supabase.co/storage/v1/object/sign/machine-images/zubehoer.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtYWNoaW5lLWltYWdlcy96dWJlaG9lci5qcGciLCJpYXQiOjE3MzgzMzQwMzAsImV4cCI6MTc2OTg3MDAzMH0.lD4f4lLWYIOgsWicLb0tN8pq0Gd4RNd8MdfempW8E5U",
-    "Saatmaschine": "https://qbqnlcmndkrpwmdepmft.supabase.co/storage/v1/object/sign/machine-images/saatmaschine.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtYWNoaW5lLWltYWdlcy9zYWF0bWFzY2hpbmUuanBnIiwiaWF0IjoxNzM4MzM0MDEyLCJleHAiOjE3Njk4NzAwMTJ9.FlZRuTAKPqpJyv24uoRMb3c9KgEyKwbJWXGEnNrQLgk"
+    Traktor:
+      'https://qbqnlcmndkrpwmdepmft.supabase.co/storage/v1/object/sign/machine-images/traktor.webp?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtYWNoaW5lLWltYWdlcy90cmFrdG9yLndlYnAiLCJpYXQiOjE3MzgzMzQwMjIsImV4cCI6MTc2OTg3MDAyMn0.mwb-ZBpCsQGaIYbhrcNfq9C6-yn_e_R9VS_ri6alE0M',
+    Mähdrescher:
+      'https://qbqnlcmndkrpwmdepmft.supabase.co/storage/v1/object/sign/machine-images/maehdrescher.jpeg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtYWNoaW5lLWltYWdlcy9tYWVoZHJlc2NoZXIuanBlZyIsImlhdCI6MTczODMzMzk5NiwiZXhwIjoxNzY5ODY5OTk2fQ.2kINjKF6WkIAqGDSnnKY0C8gR4HwBoih00kriB24gK0',
+    Anhänger:
+      'https://qbqnlcmndkrpwmdepmft.supabase.co/storage/v1/object/sign/machine-images/anhaenger.jpeg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtYWNoaW5lLWltYWdlcy9hbmhhZW5nZXIuanBlZyIsImlhdCI6MTczODMzMzk3NSwiZXhwIjoxNzY5ODY5OTc1fQ.oURIp8dyPg7wtBxTUQ7huABcyBfb5H6o5R5MivFYc9o',
+    Zubehör:
+      'https://qbqnlcmndkrpwmdepmft.supabase.co/storage/v1/object/sign/machine-images/zubehoer.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtYWNoaW5lLWltYWdlcy96dWJlaG9lci5qcGciLCJpYXQiOjE3MzgzMzQwMzAsImV4cCI6MTc2OTg3MDAzMH0.lD4f4lLWYIOgsWicLb0tN8pq0Gd4RNd8MdfempW8E5U',
+    Saatmaschine:
+      'https://qbqnlcmndkrpwmdepmft.supabase.co/storage/v1/object/sign/machine-images/saatmaschine.jpg?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtYWNoaW5lLWltYWdlcy9zYWF0bWFzY2hpbmUuanBnIiwiaWF0IjoxNzM4MzM0MDEyLCJleHAiOjE3Njk4NzAwMTJ9.FlZRuTAKPqpJyv24uoRMb3c9KgEyKwbJWXGEnNrQLgk',
   }
-  return images[category] || "https://qbqnlcmndkrpwmdepmft.supabase.co/storage/v1/object/sign/machine-images/default.webp?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtYWNoaW5lLWltYWdlcy9kZWZhdWx0LndlYnAiLCJpYXQiOjE3MzgzMzM5ODcsImV4cCI6MTc2OTg2OTk4N30.x1rNNhTyF4j-5EArDyWLAN42NQHgBFKLM2mmj3AwBEM"
+  return (
+    images[category] ||
+    'https://qbqnlcmndkrpwmdepmft.supabase.co/storage/v1/object/sign/machine-images/default.webp?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJtYWNoaW5lLWltYWdlcy9kZWZhdWx0LndlYnAiLCJpYXQiOjE3MzgzMzM5ODcsImV4cCI6MTc2OTg2OTk4N30.x1rNNhTyF4j-5EArDyWLAN42NQHgBFKLM2mmj3AwBEM'
+  )
 }
 
 onMounted(fetchMachines)
