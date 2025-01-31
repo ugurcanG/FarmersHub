@@ -313,12 +313,22 @@ def get_machines(request):
 def get_machine_details(request, machine_id):
     try:
         machine = Machine.objects.get(id=machine_id)
+        assigned_employees = machine.assigned_employees.all()  # Liste aller zugewiesenen Mitarbeiter
+
         machine_data = {
             "id": machine.id,
             "name": machine.name,
             "status": machine.status,
             "category": machine.category,
             "image_url": machine.image_url,
+            "assigned_field": {
+                "id": machine.assigned_field.id,
+                "name": machine.assigned_field.name
+            } if machine.assigned_field else None,
+            "assigned_employees": [
+                {"id": emp.id, "first_name": emp.first_name, "last_name": emp.last_name}
+                for emp in assigned_employees
+            ],  # Liste der zugewiesenen Mitarbeiter
         }
         return JsonResponse(machine_data, status=200)
     except Machine.DoesNotExist:
@@ -420,6 +430,10 @@ def get_employees(request):
             "first_name": employee.first_name,
             "last_name": employee.last_name,
             "role": employee.role,
+            "assigned_field": {
+                "id": employee.assigned_field.id,
+                "name": employee.assigned_field.name
+            } if employee.assigned_field else None,
             "assigned_machines": [
                 {"id": machine.id, "name": machine.name} for machine in assigned_machines
             ]
@@ -537,11 +551,11 @@ def generate_machine_measurements(request):
 @csrf_exempt
 def assign_employee_to_field(request):
     if request.method == "POST":
-        data = json.loads(request.body)
-        employee_id = data.get("employee_id")
-        field_id = data.get("field_id")
-
         try:
+            data = json.loads(request.body)
+            employee_id = data.get("employee_id")
+            field_id = data.get("field_id")
+
             employee = Employee.objects.get(id=employee_id)
             field = Field.objects.get(id=field_id)
 

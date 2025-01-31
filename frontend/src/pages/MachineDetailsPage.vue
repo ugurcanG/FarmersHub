@@ -8,7 +8,14 @@
         <p><strong>Zugewiesenes Feld:</strong> {{ machine.assigned_field?.name || 'Keins' }}</p>
         <p><strong>Status:</strong> {{ machine.status }}</p>
         <p><strong>Kategorie:</strong> {{ machine.category }}</p>
-        <p><strong>Aktuell zugewiesen an:</strong> {{ machine.assigned_employee?.first_name || 'Keiner' }}</p>
+        <p><strong>Aktuell zugewiesen an: </strong>
+  <span v-if="machine.assigned_employees?.length">
+    {{ machine.assigned_employees.map(emp => emp.first_name + ' ' + emp.last_name).join(', ') }}
+  </span>
+  <span v-else>Keiner</span>
+</p>
+
+
       </q-card-section>
 
       <!-- Maschinenmesswerte -->
@@ -40,6 +47,7 @@ const machineId = String(route.params.id)
 
 interface Employee {
   first_name: string;
+  last_name: string;
   // Add other properties if needed
 }
 
@@ -49,13 +57,13 @@ const machine = ref<{
   status: string;
   category: string;
   assigned_field: { name: string } | null;
-  assigned_employee: Employee | null;
+  assigned_employees: Employee[]; // Ändere von "Employee | null" zu einer **Liste**
 }>({
   id: 0,
   name: "",
   status: "",
   assigned_field: null,
-  assigned_employee: null,
+  assigned_employees: [], // Stelle sicher, dass es als **leere Liste** initialisiert ist
   category: ""
 })
 
@@ -73,6 +81,7 @@ const fetchMachineDetails = async () => {
   try {
     const response = await api.get(`/machines/${machineId}/`)
     machine.value = response.data
+    console.log("Maschinendaten:", machine.value);
   } catch (error) {
     console.error("Fehler beim Abrufen der Maschinendetails:", error)
     await router.push("/machines")
