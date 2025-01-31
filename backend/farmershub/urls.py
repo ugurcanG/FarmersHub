@@ -39,6 +39,7 @@ urlpatterns = [
     # Maschinen-URLs
     path('machines/', views.get_machines, name='get_machines'),
     path('machines/add/', views.add_machine, name='add_machine'),
+    path('machines/<int:machine_id>/', views.get_machine_details, name='get_machine_details'),
     path('machines/update/<int:machine_id>/', views.update_machine, name='update_machine'),
     path('machines/delete/<int:machine_id>/', views.delete_machine, name='delete_machine'),
 ]

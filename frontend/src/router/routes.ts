@@ -14,6 +14,11 @@ const routes: RouteRecordRaw[] = [
       },
       { path: 'employees', component: () => import('src/pages/EmployeesPage.vue') },
       { path: 'machines', component: () => import('src/pages/MachinesPage.vue') },
+      {
+        path: '/machines/:id',
+        component: () => import('src/pages/MachineDetailsPage.vue'),
+        props: true,
+      },
       { path: 'market', component: () => import('src/pages/MarketPage.vue') },
       { path: 'about', component: () => import('src/pages/AboutPage.vue') },
       { path: 'impressum', component: () => import('src/pages/ImpressumPage.vue') },

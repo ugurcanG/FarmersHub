@@ -10,7 +10,10 @@
       >
         <Card>
           <template #title>
-            {{ machine.name }}
+            <!-- Klickbarer Link zum Maschinen-Detail -->
+            <router-link :to="`/machines/${machine.id}`" class="text-primary-style text-decoration-none">
+              {{ machine.name }}
+            </router-link>
           </template>
           <template #content>
             <div class="machine-card-content">
@@ -235,5 +238,16 @@ onMounted(fetchMachines)
   max-width: 160px;
   height: auto;
   display: block;
+}
+
+a.text-primary-style {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: large;
+}
+
+a.text-primary-style:hover {
+  text-decoration: underline;
 }
 </style>

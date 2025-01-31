@@ -309,9 +309,24 @@ def chat_with_gpt(request):
     return JsonResponse({"error": "Ungültige Anfrage"}, status=400)
 
 from .models import Machine
+
 def get_machines(request):
     machines = Machine.objects.all().values('id', 'name', 'status', 'category', 'image_url')
     return JsonResponse(list(machines), safe=False)
+
+def get_machine_details(request, machine_id):
+    try:
+        machine = Machine.objects.get(id=machine_id)
+        machine_data = {
+            "id": machine.id,
+            "name": machine.name,
+            "status": machine.status,
+            "category": machine.category,
+            "image_url": machine.image_url,
+        }
+        return JsonResponse(machine_data, status=200)
+    except Machine.DoesNotExist:
+        return JsonResponse({"error": "Maschine nicht gefunden"}, status=404)
 
 # Neue Maschine hinzufügen
 @csrf_exempt
