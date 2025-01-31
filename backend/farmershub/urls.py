@@ -24,11 +24,21 @@ urlpatterns = [
 	path('helloworld/', views.view_helloworld),
 	path('measurements/', views.start_field_measurement_population),
 	path('test/', views.get_field_health_index),
+
+    # Felder-URLs
     path('fields/', views.get_fields, name='get-fields'),
     path('fields/add/', views.add_field, name='add-field'),
     path('fields/delete/<int:field_id>/', views.delete_field, name='delete-field'),
     path('fields/update/<int:field_id>/', views.update_field, name='update-field'),
     path('fields/<int:field_id>/', views.get_field_details, name='get-field-details'),
     path('fields/<int:field_id>/measurements/', views.get_field_measurements, name='get-field-measurements'),
+
+    # Chatgpt-URLs
     path('chat/', views.chat_with_gpt, name='chat-with-gpt'),
+
+    # Maschinen-URLs
+    path('machines/', views.get_machines, name='get_machines'),
+    path('machines/add/', views.add_machine, name='add_machine'),
+    path('machines/update/<int:machine_id>/', views.update_machine, name='update_machine'),
+    path('machines/delete/<int:machine_id>/', views.delete_machine, name='delete_machine'),
 ]

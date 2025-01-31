@@ -307,3 +307,45 @@ def chat_with_gpt(request):
             return JsonResponse({"error": str(e)}, status=500)
 
     return JsonResponse({"error": "Ungültige Anfrage"}, status=400)
+
+from .models import Machine
+# Alle Maschinen abrufen
+def get_machines(request):
+    machines = Machine.objects.all().values()
+    return JsonResponse(list(machines), safe=False)
+
+# Eine neue Maschine hinzufügen
+@csrf_exempt
+def add_machine(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        machine = Machine.objects.create(
+            name=data.get("name"),
+            status=data.get("status", "In Betrieb")
+        )
+        return JsonResponse({"message": "Maschine hinzugefügt", "machine": {"id": machine.id, "name": machine.name, "status": machine.status}}, status=201)
+
+# Eine Maschine aktualisieren
+@csrf_exempt
+def update_machine(request, machine_id):
+    try:
+        machine = Machine.objects.get(id=machine_id)
+    except Machine.DoesNotExist:
+        return JsonResponse({"error": "Maschine nicht gefunden"}, status=404)
+
+    if request.method == "PUT":
+        data = json.loads(request.body)
+        machine.name = data.get("name", machine.name)
+        machine.status = data.get("status", machine.status)
+        machine.save()
+        return JsonResponse({"message": "Maschine aktualisiert", "machine": {"id": machine.id, "name": machine.name, "status": machine.status}}, status=200)
+
+# Eine Maschine löschen
+@csrf_exempt
+def delete_machine(request, machine_id):
+    try:
+        machine = Machine.objects.get(id=machine_id)
+        machine.delete()
+        return JsonResponse({"message": "Maschine erfolgreich gelöscht"}, status=200)
+    except Machine.DoesNotExist:
+        return JsonResponse({"error": "Maschine nicht gefunden"}, status=404)

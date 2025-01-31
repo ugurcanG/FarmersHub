@@ -48,3 +48,12 @@ class Seed(models.Model):
 
     class Meta:
         db_table = 'seed'
+
+class Machine(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    status = models.CharField(max_length=255, choices=[('In Betrieb', 'In Betrieb'), ('Wartung erforderlich', 'Wartung erforderlich'), ('Defekt', 'Defekt')], default='In Betrieb')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'machine'
