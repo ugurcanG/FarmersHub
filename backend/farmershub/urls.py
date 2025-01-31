@@ -42,6 +42,16 @@ urlpatterns = [
     path('machines/update/<int:machine_id>/', views.update_machine, name='update_machine'),
     path('machines/delete/<int:machine_id>/', views.delete_machine, name='delete_machine'),
 
+    # Mitarbeiter-URLs
+    path('employees/', views.get_employees, name='get_employees'),
+    path('employees/add/', views.add_employee, name='add_employee'),
+    path('employees/update/<int:employee_id>/', views.update_employee, name='update_employee'),
+    path('employees/delete/<int:employee_id>/', views.delete_employee, name='delete_employee'),
+
+    # Maschinen-Nutzung
+    path('machine_usages/', views.get_machine_usages, name='get_machine_usages'),
+    path('machine_usages/add/', views.add_machine_usage, name='add_machine_usage'),
+
     # Saatgut-URLs
     path('seeds/', views.get_seeds, name='get_seeds'),
 ]

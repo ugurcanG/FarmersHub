@@ -7,7 +7,9 @@
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
 
-
+# ---------------------------------
+# Feld-Modell
+# ---------------------------------
 class Field(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255, blank=True, null=True) 
@@ -19,10 +21,12 @@ class Field(models.Model):
     class Meta:
         db_table = 'field'
 
-
+# ---------------------------------
+# Feldmessungen-Modell
+# ---------------------------------
 class FieldMeasurement(models.Model):
     id = models.BigAutoField(primary_key=True)
-    created_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
     row = models.BigIntegerField()
     column = models.BigIntegerField()
     temperature = models.FloatField(blank=True, null=True)
@@ -30,12 +34,14 @@ class FieldMeasurement(models.Model):
     soil_moisture = models.FloatField(blank=True, null=True)
     nutrients_level = models.FloatField(blank=True, null=True)
     health_score = models.FloatField(blank=True, null=True)
-    field = models.ForeignKey(Field, models.DO_NOTHING, blank=True, null=True)
+    field = models.ForeignKey('Field', on_delete=models.CASCADE, blank=True, null=True)
 
     class Meta:
         db_table = 'field_measurement'
 
-
+# ---------------------------------
+# Saatgut-Modell
+# ---------------------------------
 class Seed(models.Model):
     id = models.BigAutoField(primary_key=True)
     created_at = models.DateTimeField()
@@ -49,6 +55,30 @@ class Seed(models.Model):
     class Meta:
         db_table = 'seed'
 
+# ---------------------------------
+# Mitarbeiter-Modell
+# ---------------------------------
+class Employee(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    role = models.CharField(max_length=255, choices=[
+        ('Landwirt', 'Landwirt'),
+        ('Mechaniker', 'Mechaniker'),
+        ('Manager', 'Manager'),
+    ], default='Landwirt')
+    assigned_machine = models.ForeignKey('Machine', models.SET_NULL, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'employee'
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} ({self.role})"
+
+# ---------------------------------
+# Maschinen-Modell
+# ---------------------------------
 class Machine(models.Model):
     MACHINE_CATEGORIES = [
         ('Traktor', 'Traktor'),
@@ -66,8 +96,68 @@ class Machine(models.Model):
         ('Defekt', 'Defekt'),
     ], default='In Betrieb')
     category = models.CharField(max_length=50, choices=MACHINE_CATEGORIES, default='Traktor')
-    image_url = models.URLField(blank=True, null=True)  # Speichert die Supabase-Image-URL
+    image_url = models.URLField(blank=True, null=True)
+    year_of_manufacture = models.IntegerField(blank=True, null=True)  # Neues Feld
+    operating_hours = models.FloatField(default=0.0)  # Betriebsstunden
+    serial_number = models.CharField(max_length=100, unique=True, blank=True, null=True)
+    assigned_employee = models.ForeignKey('Employee', models.SET_NULL, blank=True, null=True)  # Wer nutzt die Maschine aktuell?
+    assigned_field = models.ForeignKey('Field', models.SET_NULL, blank=True, null=True)  # Welches Feld wird gerade bearbeitet?
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'machine'
+
+    def __str__(self):
+        return f"{self.name} ({self.category})"
+
+# ---------------------------------
+# Maschinen-Nutzungshistorie
+# ---------------------------------
+class MachineUsage(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    machine = models.ForeignKey('Machine', on_delete=models.CASCADE)
+    employee = models.ForeignKey('Employee', on_delete=models.SET_NULL, blank=True, null=True)
+    field = models.ForeignKey('Field', on_delete=models.SET_NULL, blank=True, null=True)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField(blank=True, null=True)
+    duration = models.FloatField(blank=True, null=True)  # Berechnete Dauer in Stunden
+
+    class Meta:
+        db_table = 'machine_usage'
+
+    def __str__(self):
+        return f"{self.machine.name} genutzt von {self.employee} auf {self.field} ({self.start_time})"
+
+# ---------------------------------
+# Maschinen-Wartung
+# ---------------------------------
+class MachineMaintenance(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    machine = models.ForeignKey('Machine', on_delete=models.CASCADE)
+    maintenance_date = models.DateTimeField()
+    next_maintenance = models.DateTimeField(blank=True, null=True)
+    description = models.TextField()
+
+    class Meta:
+        db_table = 'machine_maintenance'
+
+    def __str__(self):
+        return f"Wartung an {self.machine.name} am {self.maintenance_date}"
+
+# ---------------------------------
+# Maschinen-Messwerte
+# ---------------------------------
+class MachineMeasurement(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    machine = models.ForeignKey('Machine', on_delete=models.CASCADE)
+    recorded_at = models.DateTimeField(auto_now_add=True)
+    fuel_level = models.FloatField(blank=True, null=True)
+    engine_temperature = models.FloatField(blank=True, null=True)
+    oil_level = models.FloatField(blank=True, null=True)
+    rpm = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'machine_measurement'
+
+    def __str__(self):
+        return f"Messwert für {self.machine.name} ({self.recorded_at})"

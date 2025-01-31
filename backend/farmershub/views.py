@@ -379,3 +379,92 @@ def delete_machine(request, machine_id):
         return JsonResponse({"message": "Maschine erfolgreich gelöscht"}, status=200)
     except Machine.DoesNotExist:
         return JsonResponse({"error": "Maschine nicht gefunden"}, status=404)
+    
+from .models import MachineUsage
+
+# Maschinen-Nutzungen abrufen
+def get_machine_usages(request):
+    usages = MachineUsage.objects.all().values(
+        'id', 'machine__name', 'employee__first_name', 'employee__last_name', 'field__name', 'start_time', 'end_time', 'duration'
+    )
+    return JsonResponse(list(usages), safe=False)
+
+# Neue Maschinen-Nutzung hinzufügen
+@csrf_exempt
+def add_machine_usage(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        machine_id = data.get("machine_id")
+        employee_id = data.get("employee_id")
+        field_id = data.get("field_id")
+        start_time = data.get("start_time")
+
+        usage = MachineUsage.objects.create(
+            machine_id=machine_id,
+            employee_id=employee_id,
+            field_id=field_id,
+            start_time=start_time
+        )
+        return JsonResponse({"message": "Maschinen-Nutzung hinzugefügt", "usage_id": usage.id}, status=201)
+    
+from .models import Employee
+
+# Alle Mitarbeiter abrufen
+def get_employees(request):
+    employees = Employee.objects.all().values('id', 'first_name', 'last_name', 'role')
+    return JsonResponse(list(employees), safe=False)
+
+# Neuen Mitarbeiter hinzufügen
+@csrf_exempt
+def add_employee(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        employee = Employee.objects.create(
+            first_name=data.get("first_name"),
+            last_name=data.get("last_name"),
+            role=data.get("role", "Landwirt"),
+        )
+        return JsonResponse({
+            "message": "Mitarbeiter hinzugefügt",
+            "employee": {
+                "id": employee.id,
+                "first_name": employee.first_name,
+                "last_name": employee.last_name,
+                "role": employee.role
+            }
+        }, status=201)
+
+# Mitarbeiter aktualisieren
+@csrf_exempt
+def update_employee(request, employee_id):
+    try:
+        employee = Employee.objects.get(id=employee_id)
+    except Employee.DoesNotExist:
+        return JsonResponse({"error": "Mitarbeiter nicht gefunden"}, status=404)
+
+    if request.method == "PUT":
+        data = json.loads(request.body)
+        employee.first_name = data.get("first_name", employee.first_name)
+        employee.last_name = data.get("last_name", employee.last_name)
+        employee.role = data.get("role", employee.role)
+        employee.save()
+
+        return JsonResponse({
+            "message": "Mitarbeiter aktualisiert",
+            "employee": {
+                "id": employee.id,
+                "first_name": employee.first_name,
+                "last_name": employee.last_name,
+                "role": employee.role
+            }
+        }, status=200)
+
+# Mitarbeiter löschen
+@csrf_exempt
+def delete_employee(request, employee_id):
+    try:
+        employee = Employee.objects.get(id=employee_id)
+        employee.delete()
+        return JsonResponse({"message": "Mitarbeiter erfolgreich gelöscht"}, status=200)
+    except Employee.DoesNotExist:
+        return JsonResponse({"error": "Mitarbeiter nicht gefunden"}, status=404)
