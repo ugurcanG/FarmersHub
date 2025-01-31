@@ -47,10 +47,16 @@ urlpatterns = [
     path('employees/add/', views.add_employee, name='add_employee'),
     path('employees/update/<int:employee_id>/', views.update_employee, name='update_employee'),
     path('employees/delete/<int:employee_id>/', views.delete_employee, name='delete_employee'),
+    path('employees/assign_field/', views.assign_employee_to_field, name='assign_employee_to_field'),
+
 
     # Maschinen-Nutzung
     path('machine_usages/', views.get_machine_usages, name='get_machine_usages'),
     path('machine_usages/add/', views.add_machine_usage, name='add_machine_usage'),
+    path('machines/generate_measurements/', views.generate_machine_measurements, name='generate_machine_measurements'),
+
+    # Maschinen einem Mitarbeiter zuweisen
+    path('machines/assign_machines/', views.assign_machines_to_employee, name='assign_machines_to_employee'),
 
     # Saatgut-URLs
     path('seeds/', views.get_seeds, name='get_seeds'),

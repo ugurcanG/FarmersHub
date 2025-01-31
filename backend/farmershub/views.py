@@ -407,12 +407,25 @@ def add_machine_usage(request):
         )
         return JsonResponse({"message": "Maschinen-Nutzung hinzugefügt", "usage_id": usage.id}, status=201)
     
-from .models import Employee
+from .models import Employee, Machine
 
-# Alle Mitarbeiter abrufen
 def get_employees(request):
-    employees = Employee.objects.all().values('id', 'first_name', 'last_name', 'role')
-    return JsonResponse(list(employees), safe=False)
+    employees = Employee.objects.all()
+    employees_list = []
+
+    for employee in employees:
+        assigned_machines = employee.assigned_machines.all()
+        employees_list.append({
+            "id": employee.id,
+            "first_name": employee.first_name,
+            "last_name": employee.last_name,
+            "role": employee.role,
+            "assigned_machines": [
+                {"id": machine.id, "name": machine.name} for machine in assigned_machines
+            ]
+        })
+
+    return JsonResponse(employees_list, safe=False)
 
 # Neuen Mitarbeiter hinzufügen
 @csrf_exempt
@@ -468,3 +481,83 @@ def delete_employee(request, employee_id):
         return JsonResponse({"message": "Mitarbeiter erfolgreich gelöscht"}, status=200)
     except Employee.DoesNotExist:
         return JsonResponse({"error": "Mitarbeiter nicht gefunden"}, status=404)
+
+
+from django.shortcuts import get_object_or_404
+from .models import Employee, Machine
+
+@csrf_exempt
+def assign_machines_to_employee(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        employee_id = data.get("employee_id")
+        machine_ids = data.get("machine_ids", [])
+
+        try:
+            employee = Employee.objects.get(id=employee_id)
+            machines = Machine.objects.filter(id__in=machine_ids)
+
+            # Maschinen dem Mitarbeiter zuweisen
+            employee.assigned_machines.set(machines)
+
+            # Falls Mitarbeiter einem Feld zugewiesen ist, setzen wir die Maschinen auch auf dieses Feld
+            if employee.assigned_field:
+                for machine in machines:
+                    machine.assigned_field = employee.assigned_field
+                    machine.save()
+
+            return JsonResponse({"message": "Maschinen erfolgreich zugewiesen"}, status=200)
+        except Employee.DoesNotExist:
+            return JsonResponse({"error": "Mitarbeiter nicht gefunden"}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Ungültige Anfrage"}, status=400)
+
+import random
+from datetime import datetime, timedelta
+from .models import MachineMeasurement
+
+@csrf_exempt
+def generate_machine_measurements(request):
+    machines = Machine.objects.all()
+    for machine in machines:
+        for _ in range(5):  # 5 Messwerte pro Maschine
+            MachineMeasurement.objects.create(
+                machine=machine,
+                recorded_at=datetime.now() - timedelta(minutes=random.randint(1, 120)),
+                fuel_level=random.uniform(10, 100),
+                engine_temperature=random.uniform(60, 120),
+                oil_level=random.uniform(20, 80),
+                rpm=random.uniform(500, 3000),
+            )
+    return JsonResponse({"message": "Test-Messwerte für Maschinen wurden hinzugefügt."})
+
+
+@csrf_exempt
+def assign_employee_to_field(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        employee_id = data.get("employee_id")
+        field_id = data.get("field_id")
+
+        try:
+            employee = Employee.objects.get(id=employee_id)
+            field = Field.objects.get(id=field_id)
+
+            # Mitarbeiter einem Feld zuweisen
+            employee.assigned_field = field
+            employee.save()
+
+            # Falls der Mitarbeiter Maschinen hat, setzen wir diese auf dasselbe Feld
+            for machine in employee.assigned_machines.all():
+                machine.assigned_field = field
+                machine.save()
+
+            return JsonResponse({"message": "Mitarbeiter erfolgreich zugewiesen"}, status=200)
+        except (Employee.DoesNotExist, Field.DoesNotExist):
+            return JsonResponse({"error": "Mitarbeiter oder Feld nicht gefunden"}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Ungültige Anfrage"}, status=400)

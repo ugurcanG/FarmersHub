@@ -67,7 +67,9 @@ class Employee(models.Model):
         ('Mechaniker', 'Mechaniker'),
         ('Manager', 'Manager'),
     ], default='Landwirt')
-    assigned_machine = models.ForeignKey('Machine', models.SET_NULL, blank=True, null=True)
+    assigned_machines = models.ManyToManyField('Machine', blank=True)
+    assigned_field = models.ForeignKey('Field', on_delete=models.SET_NULL, blank=True, null=True)  # NEU: Feldzuweisung
+    last_activity = models.DateTimeField(auto_now=True)  # NEU: Letzte Aktivität
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -100,7 +102,7 @@ class Machine(models.Model):
     year_of_manufacture = models.IntegerField(blank=True, null=True)  # Neues Feld
     operating_hours = models.FloatField(default=0.0)  # Betriebsstunden
     serial_number = models.CharField(max_length=100, unique=True, blank=True, null=True)
-    assigned_employee = models.ForeignKey('Employee', models.SET_NULL, blank=True, null=True)  # Wer nutzt die Maschine aktuell?
+    assigned_employees = models.ManyToManyField('Employee', blank=True)
     assigned_field = models.ForeignKey('Field', models.SET_NULL, blank=True, null=True)  # Welches Feld wird gerade bearbeitet?
     created_at = models.DateTimeField(auto_now_add=True)
 
