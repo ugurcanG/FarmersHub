@@ -27,7 +27,7 @@ from .views import (
     chat_with_gpt,
 
     # Maschinen
-    get_machines, add_machine, get_machine_details, update_machine, delete_machine,
+    get_machines, add_machine, get_machine_details, update_machine, delete_machine, get_machine_measurements,
 
     # Mitarbeiter
     get_employees, add_employee, update_employee, delete_employee, assign_employee_to_field,
@@ -39,12 +39,15 @@ from .views import (
     assign_machines_to_employee,
 
     # Saatgut
-    get_seeds, add_seed, delete_seed
+    get_seeds, add_seed, delete_seed,
+
+    # Simulationen
+    generate_field_measurements,
+    generate_machine_measurements
 )
 
 
 urlpatterns = [
-    path('measurements/', start_field_measurement_population),
     path('test/', get_field_health_index),
 
     # Felder-URLs
@@ -62,6 +65,7 @@ urlpatterns = [
     path('machines/', get_machines, name='get_machines'),
     path('machines/add/', add_machine, name='add_machine'),
     path('machines/<int:machine_id>/', get_machine_details, name='get_machine_details'),
+    path('machines/<int:machine_id>/measurements/', get_machine_measurements, name='get_machine_measurements'),
     path('machines/update/<int:machine_id>/', update_machine, name='update_machine'),
     path('machines/delete/<int:machine_id>/', delete_machine, name='delete_machine'),
 
@@ -75,7 +79,6 @@ urlpatterns = [
     # Maschinen-Nutzung
     path('machine_usages/', get_machine_usages, name='get_machine_usages'),
     path('machine_usages/add/', add_machine_usage, name='add_machine_usage'),
-    path('machines/generate_measurements/', generate_machine_measurements, name='generate_machine_measurements'),
     path('machines/<int:machine_id>/stats/', get_machine_stats, name='get_machine_stats'),
 
     # Maschinen einem Mitarbeiter zuweisen
@@ -85,4 +88,9 @@ urlpatterns = [
     path("seeds/", get_seeds, name="get_seeds"),
     path("seeds/add/", add_seed, name="add_seed"),
     path("seeds/delete/<int:seed_id>/", delete_seed, name="delete_seed"),
+
+    # Simulations-URLs
+    path('simulation/generate_field_measurements/', generate_field_measurements, name='generate_field_measurements'),
+    path('simulation/generate_machine_measurements/', generate_machine_measurements, name='generate_machine_measurements'),
+
 ]

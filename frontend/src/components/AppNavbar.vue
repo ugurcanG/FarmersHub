@@ -30,6 +30,7 @@ interface Link {
 }
 
 const links: Link[] = [
+  { label: 'Simulation', path: '/simulation' },
   { label: 'Felder', path: '/fields' },
   { label: 'Saatgut', path: '/seeds' },
   { label: 'Mitarbeiter', path: '/employees' },

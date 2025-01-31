@@ -612,21 +612,64 @@ def assign_machines_to_employee(request):
 
     return JsonResponse({"error": "Ungültige Anfrage"}, status=400)
 
+@csrf_exempt
+def generate_field_measurements(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            field_id = data.get("field_id")
+
+            field = Field.objects.get(id=field_id)
+            simulation.populate_field_measurements(field)  # Simulationsfunktion aufrufen
+
+            return JsonResponse({"message": f"Messwerte für Feld {field.name} generiert!"}, status=201)
+        except Field.DoesNotExist:
+            return JsonResponse({"error": "Feld nicht gefunden"}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Ungültige Anfrage"}, status=400)
+
+def get_machine_measurements(request, machine_id):
+    """
+    Gibt alle Messwerte für eine bestimmte Maschine zurück.
+    """
+    try:
+        measurements = MachineMeasurement.objects.filter(machine_id=machine_id).values(
+            "id", "recorded_at", "fuel_level", "engine_temperature", "oil_level", "rpm"
+        )
+        return JsonResponse(list(measurements), safe=False, status=200)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
 
 @csrf_exempt
 def generate_machine_measurements(request):
-    machines = Machine.objects.all()
-    for machine in machines:
-        for _ in range(5):  # 5 Messwerte pro Maschine
-            MachineMeasurement.objects.create(
-                machine=machine,
-                recorded_at=datetime.now() - timedelta(minutes=random.randint(1, 120)),
-                fuel_level=random.uniform(10, 100),
-                engine_temperature=random.uniform(60, 120),
-                oil_level=random.uniform(20, 80),
-                rpm=random.uniform(500, 3000),
-            )
-    return JsonResponse({"message": "Test-Messwerte für Maschinen wurden hinzugefügt."})
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            machine_id = data.get("machine_id")
+
+            machine = Machine.objects.get(id=machine_id)
+
+            # Simulierte Messwerte für die Maschine generieren
+            for _ in range(5):
+                MachineMeasurement.objects.create(
+                    machine=machine,
+                    recorded_at=datetime.now() - timedelta(minutes=random.randint(1, 120)),
+                    fuel_level=random.uniform(10, 100),
+                    engine_temperature=random.uniform(60, 120),
+                    oil_level=random.uniform(20, 80),
+                    rpm=random.uniform(500, 3000),
+                )
+
+            return JsonResponse({"message": f"Messwerte für Maschine {machine.name} generiert!"}, status=201)
+        except Machine.DoesNotExist:
+            return JsonResponse({"error": "Maschine nicht gefunden"}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Ungültige Anfrage"}, status=400)
 
 
 @csrf_exempt
