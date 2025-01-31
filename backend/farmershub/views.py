@@ -1,27 +1,61 @@
 import json
-from openai import OpenAI
+import logging
+import random
+from datetime import datetime, timedelta
 from threading import Thread
+
+from django.conf import settings
+from django.db import models
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
-from django.core import serializers
-from django.http import HttpResponse
-from django.http import JsonResponse
-from django.db import models
-from django.conf import settings
-import logging
+
+from openai import OpenAI
+
+from . import simulation
+from .models import (
+    Seed, Field, FieldMeasurement, Machine, MachineUsage, 
+    Employee, MachineMeasurement
+)
 
 logger = logging.getLogger(__name__)
 
 
 
-from . import simulation
-from .models import Seed, Field, FieldMeasurement
-
-
-# http://127.0.0.1:8000/helloworld/
+# Saatgutliste abrufen
 def get_seeds(request):
-    seeds = Seed.objects.all().values('id', 'name')
+    seeds = Seed.objects.all().values("id", "name", "mass_kg", "pref_temperature", "pref_humidity", "pref_soil_moisture", "pref_nutrient_level", "created_at")
     return JsonResponse(list(seeds), safe=False)
+
+# Neues Saatgut hinzufügen
+@csrf_exempt
+def add_seed(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            seed = Seed.objects.create(
+                name=data.get("name"),
+                mass_kg=data.get("mass_kg"),
+                pref_temperature=data.get("pref_temperature"),
+                pref_humidity=data.get("pref_humidity"),
+                pref_soil_moisture=data.get("pref_soil_moisture"),
+                pref_nutrient_level=data.get("pref_nutrient_level"),
+                created_at=now()
+            )
+            return JsonResponse({"message": "Saatgut hinzugefügt", "seed_id": seed.id}, status=201)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+
+# Saatgut löschen
+@csrf_exempt
+def delete_seed(request, seed_id):
+    try:
+        seed = Seed.objects.get(id=seed_id)
+        seed.delete()
+        return JsonResponse({"message": "Saatgut erfolgreich gelöscht"}, status=200)
+    except Seed.DoesNotExist:
+        return JsonResponse({"error": "Saatgut nicht gefunden"}, status=404)
 
 # http://127.0.0.1:8000/measurements/?id=2
 def start_field_measurement_population(request):
@@ -207,7 +241,6 @@ def update_field(request, field_id):
 
             # Aktualisiere Saatgut, falls angegeben
             if saat_name is not None:
-                from .models import Seed
                 seed = Seed.objects.filter(name=saat_name).first()
                 field.saat = seed
 
@@ -304,7 +337,7 @@ def chat_with_gpt(request):
 
     return JsonResponse({"error": "Ungültige Anfrage"}, status=400)
 
-from .models import Machine
+
 
 def get_machines(request):
     machines = Machine.objects.all().values('id', 'name', 'status', 'category', 'image_url')
@@ -390,7 +423,6 @@ def delete_machine(request, machine_id):
     except Machine.DoesNotExist:
         return JsonResponse({"error": "Maschine nicht gefunden"}, status=404)
     
-from .models import MachineUsage
 
 # Maschinen-Nutzungen abrufen
 def get_machine_usages(request):
@@ -417,7 +449,6 @@ def add_machine_usage(request):
         )
         return JsonResponse({"message": "Maschinen-Nutzung hinzugefügt", "usage_id": usage.id}, status=201)
     
-from .models import Employee, Machine
 
 def get_employees(request):
     employees = Employee.objects.all()
@@ -497,8 +528,7 @@ def delete_employee(request, employee_id):
         return JsonResponse({"error": "Mitarbeiter nicht gefunden"}, status=404)
 
 
-from django.shortcuts import get_object_or_404
-from .models import Employee, Machine
+
 
 @csrf_exempt
 def assign_machines_to_employee(request):
@@ -528,9 +558,6 @@ def assign_machines_to_employee(request):
 
     return JsonResponse({"error": "Ungültige Anfrage"}, status=400)
 
-import random
-from datetime import datetime, timedelta
-from .models import MachineMeasurement
 
 @csrf_exempt
 def generate_machine_measurements(request):

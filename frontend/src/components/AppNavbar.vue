@@ -31,6 +31,7 @@ interface Link {
 
 const links: Link[] = [
   { label: 'Felder', path: '/fields' },
+  { label: 'Saatgut', path: '/seeds' },
   { label: 'Mitarbeiter', path: '/employees' },
   { label: 'Maschinen', path: '/machines' },
   { label: 'Markt', path: '/market' },

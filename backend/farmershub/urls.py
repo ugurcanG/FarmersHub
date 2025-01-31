@@ -17,47 +17,71 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from . import views
+from .views import (
+    start_field_measurement_population, get_field_health_index,
+    
+    # Felder
+    get_fields, add_field, delete_field, update_field, get_field_details, get_field_measurements,
+
+    # ChatGPT
+    chat_with_gpt,
+
+    # Maschinen
+    get_machines, add_machine, get_machine_details, update_machine, delete_machine,
+
+    # Mitarbeiter
+    get_employees, add_employee, update_employee, delete_employee, assign_employee_to_field,
+
+    # Maschinen-Nutzung
+    get_machine_usages, add_machine_usage, generate_machine_measurements,
+
+    # Maschinen einem Mitarbeiter zuweisen
+    assign_machines_to_employee,
+
+    # Saatgut
+    get_seeds, add_seed, delete_seed
+)
 
 
 urlpatterns = [
-	path('measurements/', views.start_field_measurement_population),
-	path('test/', views.get_field_health_index),
+    path('measurements/', start_field_measurement_population),
+    path('test/', get_field_health_index),
 
     # Felder-URLs
-    path('fields/', views.get_fields, name='get-fields'),
-    path('fields/add/', views.add_field, name='add-field'),
-    path('fields/delete/<int:field_id>/', views.delete_field, name='delete-field'),
-    path('fields/update/<int:field_id>/', views.update_field, name='update-field'),
-    path('fields/<int:field_id>/', views.get_field_details, name='get-field-details'),
-    path('fields/<int:field_id>/measurements/', views.get_field_measurements, name='get-field-measurements'),
+    path('fields/', get_fields, name='get-fields'),
+    path('fields/add/', add_field, name='add-field'),
+    path('fields/delete/<int:field_id>/', delete_field, name='delete-field'),
+    path('fields/update/<int:field_id>/', update_field, name='update-field'),
+    path('fields/<int:field_id>/', get_field_details, name='get-field-details'),
+    path('fields/<int:field_id>/measurements/', get_field_measurements, name='get-field-measurements'),
 
-    # Chatgpt-URLs
-    path('chat/', views.chat_with_gpt, name='chat-with-gpt'),
+    # ChatGPT-URLs
+    path('chat/', chat_with_gpt, name='chat-with-gpt'),
 
     # Maschinen-URLs
-    path('machines/', views.get_machines, name='get_machines'),
-    path('machines/add/', views.add_machine, name='add_machine'),
-    path('machines/<int:machine_id>/', views.get_machine_details, name='get_machine_details'),
-    path('machines/update/<int:machine_id>/', views.update_machine, name='update_machine'),
-    path('machines/delete/<int:machine_id>/', views.delete_machine, name='delete_machine'),
+    path('machines/', get_machines, name='get_machines'),
+    path('machines/add/', add_machine, name='add_machine'),
+    path('machines/<int:machine_id>/', get_machine_details, name='get_machine_details'),
+    path('machines/update/<int:machine_id>/', update_machine, name='update_machine'),
+    path('machines/delete/<int:machine_id>/', delete_machine, name='delete_machine'),
 
     # Mitarbeiter-URLs
-    path('employees/', views.get_employees, name='get_employees'),
-    path('employees/add/', views.add_employee, name='add_employee'),
-    path('employees/update/<int:employee_id>/', views.update_employee, name='update_employee'),
-    path('employees/delete/<int:employee_id>/', views.delete_employee, name='delete_employee'),
-    path('employees/assign_field/', views.assign_employee_to_field, name='assign_employee_to_field'),
-
+    path('employees/', get_employees, name='get_employees'),
+    path('employees/add/', add_employee, name='add_employee'),
+    path('employees/update/<int:employee_id>/', update_employee, name='update_employee'),
+    path('employees/delete/<int:employee_id>/', delete_employee, name='delete_employee'),
+    path('employees/assign_field/', assign_employee_to_field, name='assign_employee_to_field'),
 
     # Maschinen-Nutzung
-    path('machine_usages/', views.get_machine_usages, name='get_machine_usages'),
-    path('machine_usages/add/', views.add_machine_usage, name='add_machine_usage'),
-    path('machines/generate_measurements/', views.generate_machine_measurements, name='generate_machine_measurements'),
+    path('machine_usages/', get_machine_usages, name='get_machine_usages'),
+    path('machine_usages/add/', add_machine_usage, name='add_machine_usage'),
+    path('machines/generate_measurements/', generate_machine_measurements, name='generate_machine_measurements'),
 
     # Maschinen einem Mitarbeiter zuweisen
-    path('machines/assign_machines/', views.assign_machines_to_employee, name='assign_machines_to_employee'),
+    path('machines/assign_machines/', assign_machines_to_employee, name='assign_machines_to_employee'),
 
     # Saatgut-URLs
-    path('seeds/', views.get_seeds, name='get_seeds'),
+    path("seeds/", get_seeds, name="get_seeds"),
+    path("seeds/add/", add_seed, name="add_seed"),
+    path("seeds/delete/<int:seed_id>/", delete_seed, name="delete_seed"),
 ]
