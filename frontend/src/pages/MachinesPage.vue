@@ -107,6 +107,8 @@ interface Machine {
   status: string
   category: string
   image_url: string
+  serial_number: string
+  year_of_manufacture: number
 }
 
 const machines = ref<Machine[]>([])

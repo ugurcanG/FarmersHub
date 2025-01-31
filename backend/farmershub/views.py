@@ -345,14 +345,19 @@ def get_machines(request):
 
 def get_machine_details(request, machine_id):
     try:
-        machine = Machine.objects.get(id=machine_id)
-        assigned_employees = machine.assigned_employees.all()  # Liste aller zugewiesenen Mitarbeiter
+        machine = Machine.objects.prefetch_related("assigned_employees").get(id=machine_id)  # 🚀 WICHTIG
+
+        # Lade die Mitarbeiter
+        assigned_employees = Employee.objects.filter(assigned_machines=machine)  # Stelle sicher, dass es eine Liste ist
 
         machine_data = {
             "id": machine.id,
             "name": machine.name,
             "status": machine.status,
             "category": machine.category,
+            "serial_number": machine.serial_number,
+            "year_of_manufacture": machine.year_of_manufacture,
+            "operating_hours": machine.operating_hours,
             "image_url": machine.image_url,
             "assigned_field": {
                 "id": machine.assigned_field.id,
@@ -361,8 +366,11 @@ def get_machine_details(request, machine_id):
             "assigned_employees": [
                 {"id": emp.id, "first_name": emp.first_name, "last_name": emp.last_name}
                 for emp in assigned_employees
-            ],  # Liste der zugewiesenen Mitarbeiter
+            ],
         }
+
+        print("🚀 Backend sendet:", machine_data)  # Debugging
+
         return JsonResponse(machine_data, status=200)
     except Machine.DoesNotExist:
         return JsonResponse({"error": "Maschine nicht gefunden"}, status=404)
@@ -371,23 +379,62 @@ def get_machine_details(request, machine_id):
 @csrf_exempt
 def add_machine(request):
     if request.method == "POST":
-        data = json.loads(request.body)
-        machine = Machine.objects.create(
-            name=data.get("name"),
-            status=data.get("status", "In Betrieb"),
-            category=data.get("category", "Traktor"),
-            image_url=data.get("image_url")  # Bild-URL von Supabase speichern
-        )
-        return JsonResponse({
-            "message": "Maschine hinzugefügt",
-            "machine": {
-                "id": machine.id,
-                "name": machine.name,
-                "status": machine.status,
-                "category": machine.category,
-                "image_url": machine.image_url
-            }
-        }, status=201)
+        try:
+            data = json.loads(request.body)
+
+            print("Empfangene Daten:", data)  # Debugging-Log für empfangene JSON-Daten
+
+            name = data.get("name")
+            serial_number = data.get("serial_number")
+            year_of_manufacture = data.get("year_of_manufacture")
+            status = data.get("status", "In Betrieb")
+            category = data.get("category", "Traktor")
+            image_url = data.get("image_url", "")
+
+            # Validierung
+            if not name:
+                return JsonResponse({"error": "Maschinenname ist erforderlich!"}, status=400)
+            if not serial_number:
+                return JsonResponse({"error": "Seriennummer ist erforderlich!"}, status=400)
+            if not year_of_manufacture:
+                return JsonResponse({"error": "Baujahr ist erforderlich!"}, status=400)
+
+            # Stelle sicher, dass `year_of_manufacture` eine Zahl ist
+            try:
+                year_of_manufacture = int(year_of_manufacture)
+            except ValueError:
+                return JsonResponse({"error": "Baujahr muss eine Zahl sein!"}, status=400)
+
+            if year_of_manufacture < 1900 or year_of_manufacture > datetime.now().year:
+                return JsonResponse({"error": "Ungültiges Baujahr!"}, status=400)
+
+            # Maschine erstellen
+            machine = Machine.objects.create(
+                name=name,
+                serial_number=serial_number,
+                year_of_manufacture=year_of_manufacture,
+                status=status,
+                category=category,
+                image_url=image_url
+            )
+
+            return JsonResponse({
+                "message": "Maschine hinzugefügt",
+                "machine": {
+                    "id": machine.id,
+                    "name": machine.name,
+                    "serial_number": machine.serial_number,
+                    "year_of_manufacture": machine.year_of_manufacture,
+                    "status": machine.status,
+                    "category": machine.category,
+                    "image_url": machine.image_url
+                }
+            }, status=201)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Ungültiges JSON-Format"}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
 
 # Eine Maschine aktualisieren
 @csrf_exempt
@@ -430,6 +477,13 @@ def get_machine_usages(request):
         'id', 'machine__name', 'employee__first_name', 'employee__last_name', 'field__name', 'start_time', 'end_time', 'duration'
     )
     return JsonResponse(list(usages), safe=False)
+
+# Maschinen-Messwerte abrufen
+def get_machine_stats(request, machine_id):
+    measurements = MachineMeasurement.objects.filter(machine_id=machine_id).values(
+        "recorded_at", "fuel_level", "engine_temperature", "oil_level", "rpm"
+    )
+    return JsonResponse(list(measurements), safe=False)
 
 # Neue Maschinen-Nutzung hinzufügen
 @csrf_exempt

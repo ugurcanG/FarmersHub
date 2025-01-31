@@ -33,7 +33,7 @@ from .views import (
     get_employees, add_employee, update_employee, delete_employee, assign_employee_to_field,
 
     # Maschinen-Nutzung
-    get_machine_usages, add_machine_usage, generate_machine_measurements,
+    get_machine_usages, add_machine_usage, generate_machine_measurements,get_machine_stats,
 
     # Maschinen einem Mitarbeiter zuweisen
     assign_machines_to_employee,
@@ -76,6 +76,7 @@ urlpatterns = [
     path('machine_usages/', get_machine_usages, name='get_machine_usages'),
     path('machine_usages/add/', add_machine_usage, name='add_machine_usage'),
     path('machines/generate_measurements/', generate_machine_measurements, name='generate_machine_measurements'),
+    path('machines/<int:machine_id>/stats/', get_machine_stats, name='get_machine_stats'),
 
     # Maschinen einem Mitarbeiter zuweisen
     path('machines/assign_machines/', assign_machines_to_employee, name='assign_machines_to_employee'),
