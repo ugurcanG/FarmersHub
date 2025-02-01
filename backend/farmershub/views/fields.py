@@ -22,7 +22,7 @@ def get_fields(request):
                 "width": field.width,
                 "height": field.height,
                 "size": field.width * field.height,
-                "saat__name": field.saat.name if field.saat else None,
+                "saat_name": field.saat.name if field.saat else None,
                 "created_at": field.created_at,
                 "health_score": FieldMeasurement.objects.filter(field=field)
                     .aggregate(models.Avg("health_score"))["health_score__avg"] or 0,
@@ -55,7 +55,7 @@ def add_field(request):
                 "width": field.width,
                 "height": field.height,
                 "size": field.width * field.height,
-                "saat__name": field.saat.name if field.saat else None,
+                "saat_name": field.saat.name if field.saat else None,
                 "created_at": field.created_at,
             }, status=201)
         except Exception as e:
@@ -89,7 +89,7 @@ def update_field(request, field_id):
                 "width": field.width,
                 "height": field.height,
                 "size": field.width * field.height,
-                "saat__name": field.saat.name if field.saat else None,
+                "saat_name": field.saat.name if field.saat else None,
                 "created_at": field.created_at,
             }, status=200)
         except ValueError:
@@ -119,7 +119,7 @@ def get_field_details(request, field_id):
             "name": field.name,
             "size": field.width * field.height,
             "created_at": field.created_at,
-            "saat__name": field.saat.name if field.saat else None,
+            "saat_name": field.saat.name if field.saat else None,
             "health_score": FieldMeasurement.objects.filter(field=field)
                 .aggregate(models.Avg('health_score'))['health_score__avg'] or 0
         }

@@ -129,7 +129,7 @@ const fieldEmployees = ref<{ id: number; name: string; role: string }[]>([])
 const fieldLabels: Record<string, string> = {
   name: 'Feldname',
   size: 'Größe (ha)',
-  saat__name: 'Saatgut',
+  saat_name: 'Saatgut',
   created_at: 'Erstellt am',
   health_score: 'Health Score',
 }
