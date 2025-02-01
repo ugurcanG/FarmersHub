@@ -1,95 +1,105 @@
 <template>
-  <q-drawer v-model="chatDrawerOpen" side="right" :width="350" bordered class="drawer-style">
-    <div class="q-pa-md drawer-header">
-      <h5>{{ title }}</h5>
-      <q-btn flat dense icon="close" class="float-right" @click="toggleChat" />
-    </div>
-    <q-separator />
+  <div>
+    <!-- Floating Button -->
+    <q-btn
+      v-if="!chatDrawerOpen"
+      round
+      glossy
+      icon="chat"
+      color="primary"
+      class="chat-fab"
+      @click="toggleChat"
+    />
 
-    <!-- Chat-Verlauf -->
-    <div class="q-pa-md chat-messages">
-      <div v-for="(msg, index) in chatMessages" :key="index" class="chat-message">
-        <div :class="['message', msg.role === 'gpt' ? 'left' : 'right']">
-          <p>{{ msg.text }}</p>
+    <!-- Chat Drawer -->
+    <q-drawer v-model="localChatDrawerOpen" side="right" :width="350" bordered class="drawer-style">
+      <div class="q-pa-md drawer-header">
+        <h5>{{ title }}</h5>
+        <q-btn flat dense icon="close" class="float-right" @click="toggleChat" />
+      </div>
+      <q-separator />
+
+      <!-- Chat-Verlauf -->
+      <div class="q-pa-md chat-messages" ref="chatBox">
+        <div v-for="(msg, index) in chatMessages" :key="index" class="chat-message">
+          <div :class="['message', msg.role === 'gpt' ? 'left' : 'right']">
+            <p>{{ msg.text }}</p>
+          </div>
         </div>
       </div>
-    </div>
 
-    <q-separator />
-    <!-- Eingabezeile -->
-    <div class="q-pa-md chat-input">
-      <q-input
-        v-model="userMessage"
-        placeholder="Nachricht eingeben..."
-        dense
-        outlined
-        @keyup.enter="sendMessage"
-      >
-        <template v-slot:append>
-          <q-btn flat icon="send" color="primary" @click="sendMessage" />
-        </template>
-      </q-input>
-    </div>
-  </q-drawer>
+      <q-separator />
+
+      <!-- Eingabezeile -->
+      <div class="q-pa-md chat-input">
+        <q-input
+          v-model="userMessage"
+          placeholder="Nachricht eingeben..."
+          dense
+          outlined
+          @keyup.enter="sendMessage"
+        >
+          <template v-slot:append>
+            <q-btn flat icon="send" color="primary" @click="sendMessage" />
+          </template>
+        </q-input>
+      </div>
+    </q-drawer>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineEmits, watch, onMounted, nextTick } from 'vue'
-import { api } from 'boot/axios'
+import { ref, defineProps, defineEmits, watch, nextTick } from 'vue';
+import { api } from 'boot/axios';
 
 const props = defineProps({
   chatDrawerOpen: Boolean,
-  title: { type: String, default: 'Chat' },
-})
+  title: { type: String, default: 'Chat mit GPT' },
+});
 
-const emit = defineEmits(['update:chatDrawerOpen'])
-const chatMessages = ref([{ role: 'gpt', text: 'Willkommen! Wie kann ich dir helfen?' }])
-const userMessage = ref('')
+const emit = defineEmits(['update:chatDrawerOpen']);
+const localChatDrawerOpen = ref(props.chatDrawerOpen);
 
-// Chat Drawer öffnen/schließen
+watch(() => props.chatDrawerOpen, (newValue) => {
+  localChatDrawerOpen.value = newValue;
+});
+
 const toggleChat = () => {
-  emit('update:chatDrawerOpen', !props.chatDrawerOpen)
-}
+  localChatDrawerOpen.value = !localChatDrawerOpen.value;
+  emit('update:chatDrawerOpen', localChatDrawerOpen.value);
+};
 
-// Nachricht senden
+const chatMessages = ref([{ role: 'gpt', text: 'Willkommen! Wie kann ich dir helfen?' }]);
+const userMessage = ref('');
+const chatBox = ref<HTMLElement | null>(null);
+
 const sendMessage = async () => {
-  if (!userMessage.value.trim()) return
+  if (!userMessage.value.trim()) return;
 
-  // Nachricht des Benutzers hinzufügen
-  chatMessages.value.push({ role: 'user', text: userMessage.value })
+  chatMessages.value.push({ role: 'user', text: userMessage.value });
+  const userInput = userMessage.value;
+  userMessage.value = '';
 
-  const userInput = userMessage.value
-  userMessage.value = '' // Eingabefeld leeren
-
-  // "GPT schreibt..." Nachricht hinzufügen
-  chatMessages.value.push({ role: 'gpt', text: 'GPT schreibt...' })
-  scrollToBottom()
+  chatMessages.value.push({ role: 'gpt', text: 'GPT schreibt...' });
+  await scrollToBottom();
 
   try {
-    // Anfrage an Backend senden
-    const response = await api.post('/chat/', {
-      message: userInput,
-      system_message: 'Bitte antworte immer auf Deutsch.',
-    })
-
-    // GPT-Antwort hinzufügen
-    chatMessages.value.pop() // Entferne "GPT schreibt..." Nachricht
-    chatMessages.value.push({ role: 'gpt', text: response.data.reply })
-    scrollToBottom()
+    const response = await api.post('/chat/', { message: userInput, system_message: 'Bitte antworte immer auf Deutsch.' });
+    chatMessages.value.pop();
+    chatMessages.value.push({ role: 'gpt', text: response.data.reply });
+    await scrollToBottom();
   } catch (error) {
-    console.error('Fehler beim Abrufen der GPT-Antwort:', error)
-    chatMessages.value.pop()
-    chatMessages.value.push({ role: 'gpt', text: 'Entschuldigung, etwas ist schiefgelaufen.' })
-    scrollToBottom()
+    console.error('Fehler beim Abrufen der GPT-Antwort:', error);
+    chatMessages.value.pop();
+    chatMessages.value.push({ role: 'gpt', text: 'Entschuldigung, etwas ist schiefgelaufen.' });
+    await scrollToBottom();
   }
-}
+};
 
-// Automatisches Scrollen zum letzten Chat
 const scrollToBottom = async () => {
-  await nextTick()
-  const chatBox = document.querySelector('.chat-messages')
-  if (chatBox) chatBox.scrollTop = chatBox.scrollHeight
-}
+  await nextTick();
+  if (chatBox.value) chatBox.value.scrollTop = chatBox.value.scrollHeight;
+};
 </script>
 
 <style scoped>
@@ -113,6 +123,7 @@ const scrollToBottom = async () => {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  max-height: 70vh;
 }
 
 .message {
@@ -131,5 +142,22 @@ const scrollToBottom = async () => {
   background-color: #e0f7fa;
   align-self: flex-end;
   margin-left: auto;
+}
+
+.chat-input {
+  position: sticky;
+  bottom: 0;
+  padding: 16px;
+  background: #fff;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+/* Floating Button */
+.chat-fab {
+  position: fixed;
+  bottom: 80px;
+  right: 16px;
+  z-index: 10000;
 }
 </style>
