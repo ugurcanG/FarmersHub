@@ -43,11 +43,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { api } from 'boot/axios'
-import type { AxiosError } from "axios"
+import type { AxiosError } from "axios";
 
 interface Field {
-  id: number
-  name: string
+  id: number;
+  name: string;
 }
 
 interface Machine {
