@@ -15,13 +15,11 @@
             </router-link>
           </template>
           <template #content>
-            <div class="content-container">
-              <p>Größe: {{ field.size }} ha</p>
-              <p class="saat-info">
-                Saatgut: <span>{{ field.saat_name || 'Kein Saatgut zugewiesen' }}</span>
-              </p>
-            </div>
-          </template>
+  <div class="content-container">
+    <p class="saat-info">Saatgut: <span>{{ field.saat_name || 'Kein Saatgut zugewiesen' }}</span></p>
+    <p class="size-info">Größe: {{ field.size }} ha</p>
+  </div>
+</template>
           <template #icon>
             <q-btn
               flat
@@ -220,16 +218,21 @@ onMounted(fetchFields)
 <style scoped>
 .content-container {
   position: relative;
+  bottom: 20px; /* Abstand zum unteren Rand */
+  left: 10px; /* Abstand vom linken Rand */
+  width: calc(100% - 20px); /* Damit es sich an die Card-Breite anpasst */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 8px;
+  border-radius: 5px;
 }
-.saat-info {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  font-size: 0.9rem;
+
+.saat-info,
+.size-info {
+  font-size: 1rem;
   color: white;
-  margin: 0;
-  padding: 0.5rem;
-  border-radius: 4px;
+  margin: 2px 0;
 }
 
 a.text-primary-style {

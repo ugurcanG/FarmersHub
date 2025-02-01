@@ -127,10 +127,26 @@ const fetchMachines = async () => {
 
 // Maschine bearbeiten
 const editMachine = (index: number) => {
+  const machine = machines.value[index];
+
+  if (!machine) {
+    console.error(`Maschine mit Index ${index} nicht gefunden.`);
+    return;
+  }
+
   machineToEdit.value = {
-    ...machines.value[index],
-    year_of_manufacture: machines.value[index].year_of_manufacture ?? 0, // Falls `undefined`, setze 0
+    id: machine.id,
+    name: machine.name ?? '',
+    status: machine.status ?? '',
+    category: machine.category ?? '',
+    serial_number: machine.serial_number ?? '',
+    year_of_manufacture: machine.year_of_manufacture ?? 0, // Falls `undefined`, setze 0
+    operating_hours: machine.operating_hours ?? 0,
+    image_url: machine.image_url ?? '',
+    assigned_field: machine.assigned_field ?? null,
+    assigned_employees: machine.assigned_employees ?? [],
   };
+
   showEditMachineModal.value = true;
 };
 

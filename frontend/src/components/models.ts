@@ -15,7 +15,7 @@ export interface Machine {
   status: string;
   category: string;
   serial_number: string;
-  year_of_manufacture?: number;
+  year_of_manufacture: number;
   operating_hours?: number;
   image_url?: string;
   assigned_field?: Field | null;
