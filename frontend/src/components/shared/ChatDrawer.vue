@@ -14,8 +14,8 @@
     <!-- Chat Drawer -->
     <q-drawer v-model="localChatDrawerOpen" side="right" :width="350" bordered class="drawer-style">
       <div class="q-pa-md drawer-header">
-        <h5>{{ title }}</h5>
         <q-btn flat dense icon="close" class="float-right" @click="toggleChat" />
+        <h5>{{ title }}</h5>
       </div>
       <q-separator />
 
