@@ -11,7 +11,10 @@
         <Card>
           <template #title>
             <!-- Klickbarer Link zum Maschinen-Detail -->
-            <router-link :to="`/machines/${machine.id}`" class="text-primary-style text-decoration-none">
+            <router-link
+              :to="`/machines/${machine.id}`"
+              class="text-primary-style text-decoration-none"
+            >
               {{ machine.name }}
             </router-link>
           </template>
@@ -100,7 +103,7 @@ import { api } from 'boot/axios'
 import Card from 'src/components/BaseCard.vue'
 import Button from 'src/components/BaseButton.vue'
 import MachineModal from 'src/components/modals/MachineModal.vue'
-import type { Machine } from 'src/components/models';
+import type { Machine } from 'src/components/models'
 
 const machines = ref<Machine[]>([])
 const showAddMachineModal = ref(false)
@@ -127,11 +130,11 @@ const fetchMachines = async () => {
 
 // Maschine bearbeiten
 const editMachine = (index: number) => {
-  const machine = machines.value[index];
+  const machine = machines.value[index]
 
   if (!machine) {
-    console.error(`Maschine mit Index ${index} nicht gefunden.`);
-    return;
+    console.error(`Maschine mit Index ${index} nicht gefunden.`)
+    return
   }
 
   machineToEdit.value = {
@@ -145,11 +148,10 @@ const editMachine = (index: number) => {
     image_url: machine.image_url ?? '',
     assigned_field: machine.assigned_field ?? null,
     assigned_employees: machine.assigned_employees ?? [],
-  };
+  }
 
-  showEditMachineModal.value = true;
-};
-
+  showEditMachineModal.value = true
+}
 
 // Modal schließen
 const closeEditModal = () => {

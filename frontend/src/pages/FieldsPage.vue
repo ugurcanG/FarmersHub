@@ -15,11 +15,13 @@
             </router-link>
           </template>
           <template #content>
-  <div class="content-container">
-    <p class="saat-info">Saatgut: <span>{{ field.saat_name || 'Kein Saatgut zugewiesen' }}</span></p>
-    <p class="size-info">Größe: {{ field.size }} ha</p>
-  </div>
-</template>
+            <div class="content-container">
+              <p class="saat-info">
+                Saatgut: <span>{{ field.saat_name || 'Kein Saatgut zugewiesen' }}</span>
+              </p>
+              <p class="size-info">Größe: {{ field.size }} ha</p>
+            </div>
+          </template>
           <template #icon>
             <q-btn
               flat
@@ -110,7 +112,7 @@ import { api } from 'boot/axios'
 import Card from 'src/components/BaseCard.vue'
 import Button from 'src/components/BaseButton.vue'
 import FieldModal from 'src/components/modals/FieldModal.vue'
-import type { Field } from 'src/components/models';
+import type { Field } from 'src/components/models'
 
 const fields = ref<Field[]>([])
 const showAddFieldModal = ref(false)

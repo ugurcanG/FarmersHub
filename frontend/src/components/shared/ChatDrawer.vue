@@ -18,7 +18,13 @@
     <q-separator />
     <!-- Eingabezeile -->
     <div class="q-pa-md chat-input">
-      <q-input v-model="userMessage" placeholder="Nachricht eingeben..." dense outlined @keyup.enter="sendMessage">
+      <q-input
+        v-model="userMessage"
+        placeholder="Nachricht eingeben..."
+        dense
+        outlined
+        @keyup.enter="sendMessage"
+      >
         <template v-slot:append>
           <q-btn flat icon="send" color="primary" @click="sendMessage" />
         </template>
@@ -28,62 +34,62 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineEmits, watch, onMounted, nextTick } from 'vue';
-import { api } from 'boot/axios';
+import { ref, defineProps, defineEmits, watch, onMounted, nextTick } from 'vue'
+import { api } from 'boot/axios'
 
 const props = defineProps({
   chatDrawerOpen: Boolean,
   title: { type: String, default: 'Chat' },
-});
+})
 
-const emit = defineEmits(['update:chatDrawerOpen']);
-const chatMessages = ref([{ role: 'gpt', text: 'Willkommen! Wie kann ich dir helfen?' }]);
-const userMessage = ref('');
+const emit = defineEmits(['update:chatDrawerOpen'])
+const chatMessages = ref([{ role: 'gpt', text: 'Willkommen! Wie kann ich dir helfen?' }])
+const userMessage = ref('')
 
 // Chat Drawer öffnen/schließen
 const toggleChat = () => {
-  emit('update:chatDrawerOpen', !props.chatDrawerOpen);
-};
+  emit('update:chatDrawerOpen', !props.chatDrawerOpen)
+}
 
 // Nachricht senden
 const sendMessage = async () => {
-  if (!userMessage.value.trim()) return;
+  if (!userMessage.value.trim()) return
 
   // Nachricht des Benutzers hinzufügen
-  chatMessages.value.push({ role: 'user', text: userMessage.value });
+  chatMessages.value.push({ role: 'user', text: userMessage.value })
 
-  const userInput = userMessage.value;
-  userMessage.value = ''; // Eingabefeld leeren
+  const userInput = userMessage.value
+  userMessage.value = '' // Eingabefeld leeren
 
   // "GPT schreibt..." Nachricht hinzufügen
-  chatMessages.value.push({ role: 'gpt', text: 'GPT schreibt...' });
-  scrollToBottom();
+  chatMessages.value.push({ role: 'gpt', text: 'GPT schreibt...' })
+  scrollToBottom()
 
   try {
     // Anfrage an Backend senden
     const response = await api.post('/chat/', {
       message: userInput,
       system_message: 'Bitte antworte immer auf Deutsch.',
-    });
+    })
 
     // GPT-Antwort hinzufügen
-    chatMessages.value.pop(); // Entferne "GPT schreibt..." Nachricht
-    chatMessages.value.push({ role: 'gpt', text: response.data.reply });
-    scrollToBottom();
+    chatMessages.value.pop() // Entferne "GPT schreibt..." Nachricht
+    chatMessages.value.push({ role: 'gpt', text: response.data.reply })
+    scrollToBottom()
   } catch (error) {
-    console.error('Fehler beim Abrufen der GPT-Antwort:', error);
-    chatMessages.value.pop();
-    chatMessages.value.push({ role: 'gpt', text: 'Entschuldigung, etwas ist schiefgelaufen.' });
-    scrollToBottom();
+    console.error('Fehler beim Abrufen der GPT-Antwort:', error)
+    chatMessages.value.pop()
+    chatMessages.value.push({ role: 'gpt', text: 'Entschuldigung, etwas ist schiefgelaufen.' })
+    scrollToBottom()
   }
-};
+}
 
 // Automatisches Scrollen zum letzten Chat
 const scrollToBottom = async () => {
-  await nextTick();
-  const chatBox = document.querySelector('.chat-messages');
-  if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
-};
+  await nextTick()
+  const chatBox = document.querySelector('.chat-messages')
+  if (chatBox) chatBox.scrollTop = chatBox.scrollHeight
+}
 </script>
 
 <style scoped>

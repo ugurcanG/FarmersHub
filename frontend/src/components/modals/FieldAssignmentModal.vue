@@ -7,13 +7,13 @@
 
       <q-card-section>
         <q-select
-        v-model="selectedField"
-  :options="fieldOptions"
-  option-label="name"
-  option-value="id"
-  label="Feld auswählen"
-  dense
-  filled
+          v-model="selectedField"
+          :options="fieldOptions"
+          option-label="name"
+          option-value="id"
+          label="Feld auswählen"
+          dense
+          filled
         />
       </q-card-section>
 
@@ -28,7 +28,7 @@
 <script setup lang="ts">
 import { ref, defineProps, defineEmits } from 'vue'
 import { api } from 'boot/axios'
-import type { Field } from 'src/components/models';
+import type { Field } from 'src/components/models'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -38,7 +38,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'fieldAssigned'])
 
-const selectedField = ref<Field | null>(null);
+const selectedField = ref<Field | null>(null)
 
 const closeModal = () => {
   emit('update:modelValue', false)
@@ -47,24 +47,24 @@ const closeModal = () => {
 const saveFieldAssignment = async () => {
   try {
     if (!props.employeeId || !selectedField.value) {
-      console.error("Fehlende Daten:", { employeeId: props.employeeId, field: selectedField.value });
-      return;
+      console.error('Fehlende Daten:', { employeeId: props.employeeId, field: selectedField.value })
+      return
     }
 
-    console.log("Sende Daten an API:", {
+    console.log('Sende Daten an API:', {
       employee_id: props.employeeId,
-      field_id: selectedField.value.id // Fix: Zugriff auf die ID
-    });
+      field_id: selectedField.value.id, // Fix: Zugriff auf die ID
+    })
 
     await api.post('/employees/assign_field/', {
       employee_id: props.employeeId,
-      field_id: selectedField.value.id // Fix: ID statt Objekt
-    });
+      field_id: selectedField.value.id, // Fix: ID statt Objekt
+    })
 
-    emit('fieldAssigned');
-    closeModal();
+    emit('fieldAssigned')
+    closeModal()
   } catch (error) {
-    console.error('Fehler beim Speichern der Feldzuweisung:', error);
+    console.error('Fehler beim Speichern der Feldzuweisung:', error)
   }
-};
+}
 </script>

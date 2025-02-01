@@ -28,11 +28,11 @@
       </q-card-section>
     </q-card>
     <ChartContainer
-  :labels="labels"
-  :data="formattedData"
-  :chartOptions="chartOptions"
-  title="Messwerte-Analyse"
-/>
+      :labels="labels"
+      :data="formattedData"
+      :chartOptions="chartOptions"
+      title="Messwerte-Analyse"
+    />
 
     <!-- Floating Button -->
     <q-btn
@@ -85,9 +85,8 @@
 import { ref, onMounted, watch, onBeforeUnmount, defineProps } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api } from 'boot/axios'
-import type { FieldMeasurement } from 'src/components/models';
+import type { FieldMeasurement } from 'src/components/models'
 import ChartContainer from 'src/components/shared/ChartContainer.vue'
-
 
 defineProps({
   id: {
@@ -228,20 +227,18 @@ const fetchMeasurements = async () => {
   }
 }
 
-const labels = ref<string[]>([]);
-const formattedData = ref<{ [key: string]: number }[]>([]);
+const labels = ref<string[]>([])
+const formattedData = ref<{ [key: string]: number }[]>([])
 const chartOptions = ref([
   { label: 'Temperatur (°C)', value: 'temperature' },
   { label: 'Luftfeuchtigkeit (%)', value: 'humidity' },
   { label: 'Bodenfeuchte (%)', value: 'soil_moisture' },
   { label: 'Nährstoffe', value: 'nutrients_level' },
   { label: 'Health Score', value: 'health_score' },
-]);
+])
 
 watch(fieldMeasurements, () => {
-  labels.value = fieldMeasurements.value.map((m) =>
-    new Date(m.created_at).toLocaleDateString()
-  );
+  labels.value = fieldMeasurements.value.map((m) => new Date(m.created_at).toLocaleDateString())
 
   formattedData.value = fieldMeasurements.value.map((m) => ({
     temperature: m.temperature || 0,
@@ -249,8 +246,8 @@ watch(fieldMeasurements, () => {
     soil_moisture: m.soil_moisture || 0,
     nutrients_level: m.nutrients_level || 0,
     health_score: m.health_score || 0,
-  }));
-});
+  }))
+})
 
 const goBack = async () => {
   await router.push('/fields')

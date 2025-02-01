@@ -46,18 +46,21 @@ const props = defineProps({
 const selectedLineData = ref(props.chartOptions[0]) // Standard erste Option
 const selectedBarData = ref(props.chartOptions[1]) // Standard zweite Option
 
-const lineData = ref<number[]>([]);
-const barData = ref<number[]>([]);
+const lineData = ref<number[]>([])
+const barData = ref<number[]>([])
 
 watch([selectedLineData, selectedBarData, props.data], () => {
   if (!props.data || props.data.length === 0) {
-    lineData.value = [];
-    barData.value = [];
-    return;
+    lineData.value = []
+    barData.value = []
+    return
   }
 
-  lineData.value = props.data.map((m) => selectedLineData.value ? (m[selectedLineData.value.value] || 0) : 0);
-  barData.value = props.data.map((m) => selectedBarData.value ? (m[selectedBarData.value.value] || 0) : 0);
-});
-
+  lineData.value = props.data.map((m) =>
+    selectedLineData.value ? m[selectedLineData.value.value] || 0 : 0,
+  )
+  barData.value = props.data.map((m) =>
+    selectedBarData.value ? m[selectedBarData.value.value] || 0 : 0,
+  )
+})
 </script>

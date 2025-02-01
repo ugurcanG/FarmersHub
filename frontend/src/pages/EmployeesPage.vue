@@ -3,7 +3,14 @@
     <h3 class="text-h5 text-dark">Mitarbeiterverwaltung</h3>
 
     <!-- Suchfeld -->
-    <q-input v-model="search" filled dense debounce="300" placeholder="Mitarbeiter suchen..." class="q-mb-md">
+    <q-input
+      v-model="search"
+      filled
+      dense
+      debounce="300"
+      placeholder="Mitarbeiter suchen..."
+      class="q-mb-md"
+    >
       <template v-slot:prepend>
         <q-icon name="search" />
       </template>
@@ -20,16 +27,34 @@
       no-data-label="Keine Mitarbeiter gefunden"
     >
       <template v-slot:top-right>
-        <q-btn color="primary" label="Mitarbeiter hinzufügen" @click="showAddEmployeeModal = true" />
+        <q-btn
+          color="primary"
+          label="Mitarbeiter hinzufügen"
+          @click="showAddEmployeeModal = true"
+        />
       </template>
 
       <!-- Maschinen-Zuweisungs-Button jetzt in der "Aktionen"-Spalte -->
       <template v-slot:body-cell-actions="props">
         <q-td :props="props">
           <q-btn icon="map" color="green" flat round dense @click="openFieldModal(props.row)" />
-          <q-btn icon="construction" color="primary" flat round dense @click="openMachineModal(props.row)" />
+          <q-btn
+            icon="construction"
+            color="primary"
+            flat
+            round
+            dense
+            @click="openMachineModal(props.row)"
+          />
           <q-btn icon="edit" color="primary" flat round dense @click="editEmployee(props.row)" />
-          <q-btn icon="delete" color="negative" flat round dense @click="confirmDelete(props.row.id)" />
+          <q-btn
+            icon="delete"
+            color="negative"
+            flat
+            round
+            dense
+            @click="confirmDelete(props.row.id)"
+          />
         </q-td>
       </template>
 
@@ -70,12 +95,12 @@
     />
 
     <FieldAssignmentModal
-  :model-value="showFieldModal"
-  @update:model-value="showFieldModal = $event"
-  :employeeId="selectedEmployeeForField?.id ?? 0"
-  :fieldOptions="fieldOptions"
-  @fieldAssigned="fetchEmployees"
-/>
+      :model-value="showFieldModal"
+      @update:model-value="showFieldModal = $event"
+      :employeeId="selectedEmployeeForField?.id ?? 0"
+      :fieldOptions="fieldOptions"
+      @fieldAssigned="fetchEmployees"
+    />
 
     <!-- Löschdialog -->
     <q-dialog v-model="showDeleteDialog">
@@ -83,10 +108,17 @@
         <q-card-section>
           <div class="text-h6">Mitarbeiter löschen</div>
         </q-card-section>
-        <q-card-section> Bist du sicher, dass du diesen Mitarbeiter löschen möchtest? </q-card-section>
+        <q-card-section>
+          Bist du sicher, dass du diesen Mitarbeiter löschen möchtest?
+        </q-card-section>
         <q-card-actions align="right">
           <q-btn flat label="Abbrechen" color="primary" @click="showDeleteDialog = false" />
-            <q-btn flat label="Löschen" color="negative" @click="selectedEmployeeId !== null && deleteEmployee(selectedEmployeeId)" />
+          <q-btn
+            flat
+            label="Löschen"
+            color="negative"
+            @click="selectedEmployeeId !== null && deleteEmployee(selectedEmployeeId)"
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -99,7 +131,7 @@ import { api } from 'boot/axios'
 import EmployeeModal from 'src/components/modals/EmployeeModal.vue'
 import MachineAssignmentModal from 'src/components/modals/MachineAssignmentModal.vue'
 import FieldAssignmentModal from 'src/components/modals/FieldAssignmentModal.vue'
-import type { Field, Machine, Employee } from 'src/components/models';
+import type { Field, Machine, Employee } from 'src/components/models'
 
 const showFieldModal = ref(false)
 const fieldOptions = ref<Field[]>([])
@@ -130,8 +162,10 @@ const filteredEmployees = computed(() => {
   if (!search.value) {
     return employees.value
   }
-  return employees.value.filter(employee =>
-    `${employee.first_name} ${employee.last_name} ${employee.role}`.toLowerCase().includes(search.value.toLowerCase())
+  return employees.value.filter((employee) =>
+    `${employee.first_name} ${employee.last_name} ${employee.role}`
+      .toLowerCase()
+      .includes(search.value.toLowerCase()),
   )
 })
 const showAddEmployeeModal = ref(false)
@@ -143,11 +177,22 @@ const showMachineModal = ref(false)
 const selectedEmployee = ref<Employee | null>(null)
 
 // Spalten für die Tabelle
-const columns: { name: string; label: string; field: string | ((row: Employee) => string); align: 'left' | 'center' | 'right'; sortable?: boolean }[] = [
+const columns: {
+  name: string
+  label: string
+  field: string | ((row: Employee) => string)
+  align: 'left' | 'center' | 'right'
+  sortable?: boolean
+}[] = [
   { name: 'first_name', label: 'Vorname', align: 'left', field: 'first_name', sortable: true },
   { name: 'last_name', label: 'Nachname', align: 'left', field: 'last_name', sortable: true },
   { name: 'role', label: 'Rolle', align: 'left', field: 'role', sortable: true },
-  { name: 'assigned_field', label: 'Zugewiesenes Feld', align: 'left', field: (row: Employee) => row.assigned_field?.name || 'Kein Feld' },
+  {
+    name: 'assigned_field',
+    label: 'Zugewiesenes Feld',
+    align: 'left',
+    field: (row: Employee) => row.assigned_field?.name || 'Kein Feld',
+  },
   { name: 'assigned_machines', label: 'Maschinen', align: 'left', field: 'assigned_machines' },
   { name: 'actions', label: 'Aktionen', align: 'center', field: 'id' },
 ]
@@ -158,7 +203,7 @@ const fetchEmployees = async () => {
     const response = await api.get('/employees/')
     employees.value = response.data.map((employee: Employee) => ({
       ...employee,
-      assigned_machines: employee.assigned_machines ?? [] // Falls null, leeres Array setzen
+      assigned_machines: employee.assigned_machines ?? [], // Falls null, leeres Array setzen
     }))
   } catch (error) {
     console.error('Fehler beim Abrufen der Mitarbeiter:', error)
@@ -177,13 +222,17 @@ const fetchMachines = async () => {
 
 // Maschinen-Zuweisungs-Modal öffnen
 const openMachineModal = (employee: Employee) => {
-  console.log("Maschinen-Modal öffnen für:", employee)
+  console.log('Maschinen-Modal öffnen für:', employee)
   selectedEmployee.value = employee
   showMachineModal.value = true
 }
 
 // Neuen Mitarbeiter hinzufügen (fix: Modal schließt sich nach Hinzufügen)
-const addEmployee = async (employeeData: { first_name: string; last_name: string; role: string }) => {
+const addEmployee = async (employeeData: {
+  first_name: string
+  last_name: string
+  role: string
+}) => {
   try {
     const response = await api.post('/employees/add/', employeeData)
     if (response.data.employee) {
@@ -210,7 +259,11 @@ const closeEditModal = () => {
 }
 
 // Mitarbeiter aktualisieren
-const updateEmployee = async (updatedEmployee: { first_name: string; last_name: string; role: string }) => {
+const updateEmployee = async (updatedEmployee: {
+  first_name: string
+  last_name: string
+  role: string
+}) => {
   if (!employeeToEdit.value) return
 
   try {

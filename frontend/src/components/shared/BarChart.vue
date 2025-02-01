@@ -4,7 +4,15 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, onBeforeUnmount } from 'vue'
-import { Chart, BarController, BarElement, LinearScale, CategoryScale, Tooltip, Title } from 'chart.js'
+import {
+  Chart,
+  BarController,
+  BarElement,
+  LinearScale,
+  CategoryScale,
+  Tooltip,
+  Title,
+} from 'chart.js'
 
 // Chart.js Komponenten registrieren
 Chart.register(BarController, BarElement, LinearScale, CategoryScale, Tooltip, Title)
@@ -54,7 +62,6 @@ onMounted(renderChart)
 watch(() => [props.labels, props.data], renderChart)
 
 onBeforeUnmount(() => {
-  if (chartInstance) chartInstance.destroy();
-});
-
+  if (chartInstance) chartInstance.destroy()
+})
 </script>

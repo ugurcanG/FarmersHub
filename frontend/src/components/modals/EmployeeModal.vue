@@ -14,7 +14,11 @@
 
       <q-card-actions align="right">
         <q-btn flat label="Abbrechen" @click="cancel" />
-        <q-btn color="primary" :label="employeeToEdit ? 'Speichern' : 'Erstellen'" @click="submitEmployee" />
+        <q-btn
+          color="primary"
+          :label="employeeToEdit ? 'Speichern' : 'Erstellen'"
+          @click="submitEmployee"
+        />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -27,7 +31,11 @@ import type { PropType } from 'vue'
 const emit = defineEmits(['close', 'submit'])
 const { showModal, employeeToEdit } = defineProps({
   showModal: Boolean,
-  employeeToEdit: Object as PropType<{ first_name: string; last_name: string; role: string } | null>,
+  employeeToEdit: Object as PropType<{
+    first_name: string
+    last_name: string
+    role: string
+  } | null>,
 })
 
 const localShowModal = computed({

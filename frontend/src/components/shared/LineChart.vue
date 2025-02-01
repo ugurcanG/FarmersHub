@@ -4,10 +4,27 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, onBeforeUnmount } from 'vue'
-import { Chart, LineController, LineElement, LinearScale, PointElement, CategoryScale, Tooltip, Title } from 'chart.js'
+import {
+  Chart,
+  LineController,
+  LineElement,
+  LinearScale,
+  PointElement,
+  CategoryScale,
+  Tooltip,
+  Title,
+} from 'chart.js'
 
 // Chart.js Komponenten registrieren
-Chart.register(LineController, LineElement, LinearScale, PointElement, CategoryScale, Tooltip, Title)
+Chart.register(
+  LineController,
+  LineElement,
+  LinearScale,
+  PointElement,
+  CategoryScale,
+  Tooltip,
+  Title,
+)
 
 // Props mit TypeScript-Typisierung
 const props = defineProps({

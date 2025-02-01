@@ -9,13 +9,18 @@
         <q-list bordered separator>
           <q-item v-for="machine in machineOptions" :key="machine.id">
             <q-item-section avatar>
-              <q-img v-if="machine.image_url" :src="machine.image_url" style="width: 50px; height: 50px;" />
+              <q-img
+                v-if="machine.image_url"
+                :src="machine.image_url"
+                style="width: 50px; height: 50px"
+              />
             </q-item-section>
             <q-item-section>
               <q-checkbox v-model="selectedMachines" :val="machine.id" />
               <div>{{ machine.name }}</div>
               <div class="text-caption">
-                {{ machine.category }} - {{ machine.status }} - {{ machine.operating_hours }} Betriebsstunden
+                {{ machine.category }} - {{ machine.status }} -
+                {{ machine.operating_hours }} Betriebsstunden
               </div>
             </q-item-section>
           </q-item>
@@ -33,7 +38,7 @@
 <script setup lang="ts">
 import { ref, defineProps, defineEmits, watch } from 'vue'
 import { api } from 'boot/axios'
-import type { Machine } from 'src/components/models';
+import type { Machine } from 'src/components/models'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -47,11 +52,11 @@ const emit = defineEmits(['update:modelValue', 'machinesUpdated'])
 const selectedMachines = ref<number[]>([])
 
 watch(
-  () => props.employeeId,  // Beobachte, wenn sich die `employeeId` ändert
+  () => props.employeeId, // Beobachte, wenn sich die `employeeId` ändert
   () => {
-    selectedMachines.value = (props.assignedMachines ?? []).map(machine => machine.id)
+    selectedMachines.value = (props.assignedMachines ?? []).map((machine) => machine.id)
   },
-  { immediate: true }  // Sofort beim Laden des Modals ausführen
+  { immediate: true }, // Sofort beim Laden des Modals ausführen
 )
 
 const closeModal = () => {
@@ -64,7 +69,7 @@ const saveMachineAssignments = async () => {
 
     await api.post('/machines/assign_machines/', {
       employee_id: props.employeeId,
-      machine_ids: selectedMachines.value
+      machine_ids: selectedMachines.value,
     })
 
     emit('machinesUpdated')

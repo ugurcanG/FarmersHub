@@ -38,13 +38,18 @@
 import { ref, defineEmits, defineProps, computed, watch, onMounted } from 'vue'
 import { api } from 'boot/axios'
 import type { PropType } from 'vue'
-import type { Field } from 'src/components/models';
+import type { Field } from 'src/components/models'
 
 const emit = defineEmits(['close', 'submit'])
 const props = defineProps({
   showModal: Boolean,
   fieldToEdit: {
-    type: Object as PropType<{ name: string; width: number; height: number; saat_name: string } | null>,
+    type: Object as PropType<{
+      name: string
+      width: number
+      height: number
+      saat_name: string
+    } | null>,
     default: null,
   },
 })

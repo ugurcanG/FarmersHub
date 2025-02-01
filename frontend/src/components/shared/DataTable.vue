@@ -10,6 +10,6 @@
 defineProps({
   rows: Array,
   columns: Array,
-});
-defineEmits(['refresh']);
+})
+defineEmits(['refresh'])
 </script>

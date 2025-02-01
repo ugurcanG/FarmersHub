@@ -20,12 +20,10 @@
 
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router'
-import type { Link } from 'src/components/models';
+import type { Link } from 'src/components/models'
 
 const router = useRouter()
 const route = useRoute()
-
-
 
 const links: Link[] = [
   { label: 'Simulation', path: '/simulation' },
