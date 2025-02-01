@@ -1,5 +1,6 @@
 <template>
   <q-page class="q-pa-md">
+    <h3 class="text-h5 text-dark">Saatgut Verwaltung</h3>
     <q-btn label="Neues Saatgut hinzufügen" color="primary" @click="openSeedDialog()" class="q-mb-md" />
     <!-- Saatgut-Tabelle mit Hinzufügen-Button -->
     <DataTable :rows="seeds" :columns="columns" @refresh="fetchSeeds">
