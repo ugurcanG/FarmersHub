@@ -55,13 +55,13 @@ export interface MachineMeasurement {
 }
 
 export interface Seed {
-  id: number
+  id?: number
   name: string
-  mass_kg: number
-  pref_temperature?: number | null
-  pref_humidity?: number | null
-  pref_soil_moisture?: number | null
-  pref_nutrient_level?: number | null
+  mass_kg: number | null
+  pref_temperature: number | null
+  pref_humidity: number | null
+  pref_soil_moisture: number | null
+  pref_nutrient_level: number | null
 }
 
 export interface Link {

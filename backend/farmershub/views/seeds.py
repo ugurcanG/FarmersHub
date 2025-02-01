@@ -56,3 +56,23 @@ def delete_seed(request, seed_id):
         return JsonResponse({"message": "Saatgut erfolgreich gelöscht"}, status=200)
     except Seed.DoesNotExist:
         return JsonResponse({"error": "Saatgut nicht gefunden"}, status=404)
+
+@csrf_exempt
+def update_seed(request, seed_id):
+    """
+    Aktualisiert eine bestehende Saatgutsorte.
+    """
+    try:
+        seed = Seed.objects.get(id=seed_id)
+    except Seed.DoesNotExist:
+        return JsonResponse({"error": "Saatgut nicht gefunden"}, status=404)
+
+    if request.method == "PUT":
+        try:
+            data = json.loads(request.body)
+            for key, value in data.items():
+                setattr(seed, key, value)
+            seed.save()
+            return JsonResponse({"message": "Saatgut aktualisiert"}, status=200)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)

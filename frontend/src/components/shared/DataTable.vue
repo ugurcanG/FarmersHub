@@ -3,6 +3,10 @@
     <template v-slot:top-right>
       <q-btn flat icon="refresh" @click="$emit('refresh')" label="Aktualisieren" />
     </template>
+
+    <template v-slot:body-cell-actions="props">
+      <slot name="body-cell-actions" v-bind="props"></slot>
+    </template>
   </q-table>
 </template>
 
