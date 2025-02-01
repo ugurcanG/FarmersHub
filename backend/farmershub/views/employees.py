@@ -123,3 +123,21 @@ def assign_employee_to_field(request):
             return JsonResponse({"error": "Mitarbeiter oder Feld nicht gefunden"}, status=404)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
+
+def get_employees_by_field(request, field_id):
+    """
+    Gibt alle Mitarbeiter zurück, die einem bestimmten Feld zugewiesen sind.
+    """
+    employees = Employee.objects.filter(assigned_field_id=field_id).values("id", "first_name", "last_name", "role")
+
+    # Den vollständigen Namen in einem Feld zusammenfassen
+    employees_list = [
+        {
+            "id": emp["id"],
+            "name": f"{emp['first_name']} {emp['last_name']}",
+            "role": emp["role"],
+        }
+        for emp in employees
+    ]
+
+    return JsonResponse(employees_list, safe=False)

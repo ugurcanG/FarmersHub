@@ -208,7 +208,7 @@ const columns = [
 const machineColumns = [
   { name: 'id', label: 'ID', field: 'id', align: 'left' as const },
   { name: 'name', label: 'Maschinenname', field: 'name', align: 'left' as const },
-  { name: 'type', label: 'Typ', field: 'type', align: 'left' as const },
+  { name: 'type', label: 'Maschinentyp', field: 'type', align: 'left' as const },
 ]
 
 const employeeColumns = [
@@ -234,12 +234,37 @@ const fieldId = String(route.params.id)
 const fetchFieldDetails = async () => {
   try {
     const response = await api.get(`/fields/${fieldId}/`)
+
     field.value = response.data
+
+    await fetchMachinesForField(fieldId)
+await fetchEmployeesForField(fieldId)
+
+
   } catch (error) {
     console.error('Fehler beim Abrufen der Felddetails:', error)
     await router.push('/fields')
   }
 }
+
+const fetchMachinesForField = async (fieldId: string) => {
+  try {
+    const response = await api.get(`/machines/by-field/${fieldId}/`)
+    fieldMachines.value = response.data || []
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Maschinen für das Feld:', error)
+  }
+}
+
+const fetchEmployeesForField = async (fieldId: string) => {
+  try {
+    const response = await api.get(`/employees/by-field/${fieldId}/`)
+    fieldEmployees.value = response.data || []
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Mitarbeiter für das Feld:', error)
+  }
+}
+
 
 const fetchMeasurements = async () => {
   try {

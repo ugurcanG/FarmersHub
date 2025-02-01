@@ -271,3 +271,17 @@ def assign_machines_to_employee(request):
             return JsonResponse({"error": "Mitarbeiter nicht gefunden"}, status=404)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
+
+def get_machines_by_field(request, field_id):
+    """
+    Gibt alle Maschinen zurück, die einem bestimmten Feld zugewiesen sind.
+    """
+    machines = Machine.objects.filter(assigned_field_id=field_id).values("id", "name", "category")
+    
+    # Maschinen-Typ hinzufügen
+    machines_list = [
+        {"id": machine["id"], "name": machine["name"], "type": machine["category"]}
+        for machine in machines
+    ]
+
+    return JsonResponse(machines_list, safe=False)
