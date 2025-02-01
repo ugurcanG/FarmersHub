@@ -16,39 +16,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from .views.fields import get_fields, add_field, delete_field, update_field, get_field_details, get_field_measurements
+from .views.machines import get_machines, add_machine, get_machine_details, update_machine, delete_machine, get_machine_measurements, get_machine_stats, get_machine_usages, add_machine_usage, generate_machine_measurements, assign_machines_to_employee
+from .views.seeds import get_seeds, add_seed, delete_seed
+from .views.employees import get_employees, add_employee, update_employee, delete_employee, assign_employee_to_field
+from .views.simulation import generate_field_measurements, generate_machine_measurements
+from .views.chatgpt import chat_with_gpt
 
-from .views import (
-    start_field_measurement_population, get_field_health_index,
-    
-    # Felder
-    get_fields, add_field, delete_field, update_field, get_field_details, get_field_measurements,
-
-    # ChatGPT
-    chat_with_gpt,
-
-    # Maschinen
-    get_machines, add_machine, get_machine_details, update_machine, delete_machine, get_machine_measurements,
-
-    # Mitarbeiter
-    get_employees, add_employee, update_employee, delete_employee, assign_employee_to_field,
-
-    # Maschinen-Nutzung
-    get_machine_usages, add_machine_usage, generate_machine_measurements,get_machine_stats,
-
-    # Maschinen einem Mitarbeiter zuweisen
-    assign_machines_to_employee,
-
-    # Saatgut
-    get_seeds, add_seed, delete_seed,
-
-    # Simulationen
-    generate_field_measurements,
-    generate_machine_measurements
-)
 
 
 urlpatterns = [
-    path('test/', get_field_health_index),
 
     # Felder-URLs
     path('fields/', get_fields, name='get-fields'),
@@ -68,6 +45,8 @@ urlpatterns = [
     path('machines/<int:machine_id>/measurements/', get_machine_measurements, name='get_machine_measurements'),
     path('machines/update/<int:machine_id>/', update_machine, name='update_machine'),
     path('machines/delete/<int:machine_id>/', delete_machine, name='delete_machine'),
+    path('machines/<int:machine_id>/stats/', get_machine_stats, name='get_machine_stats'),
+
 
     # Mitarbeiter-URLs
     path('employees/', get_employees, name='get_employees'),

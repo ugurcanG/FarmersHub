@@ -43,6 +43,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { api } from 'boot/axios'
+import type { AxiosError } from "axios"
 
 interface Field {
   id: number
@@ -91,33 +92,46 @@ const fetchMachines = async () => {
 }
 
 // API-Request zur Simulation der Feld-Messwerte
-const generateFieldMeasurements = async () => {
+const generateFieldMeasurements = async (): Promise<void> => {
   try {
     const response: ApiResponse<{ message: string }> = await api.post('/simulation/generate_field_measurements/', {
       field_id: selectedField.value?.value
     })
     message.value = response.data.message
   } catch (error) {
-    console.error('Fehler beim Generieren von Messwerten:', error)
-    message.value = "Fehler bei der Messwert-Generierung!"
+    const axiosError = error as AxiosError<{ error: string }>;
+
+    console.error(
+      'Fehler beim Generieren von Messwerten:',
+      axiosError.response?.data?.error || axiosError.message
+    );
+
+    message.value = axiosError.response?.data?.error || "Fehler bei der Messwert-Generierung!";
   }
 }
 
 // API-Request zur Simulation der Maschinen-Messwerte
-const generateMachineMeasurements = async () => {
+const generateMachineMeasurements = async (): Promise<void> => {
   try {
     const response: ApiResponse<{ message: string }> = await api.post('/simulation/generate_machine_measurements/', {
       machine_id: selectedMachine.value?.value
     })
     message.value = response.data.message
   } catch (error) {
-    console.error('Fehler beim Generieren von Maschinenmesswerten:', error)
-    message.value = "Fehler bei der Maschinen-Messwert-Generierung!"
+    const axiosError = error as AxiosError<{ error: string }>;
+
+    console.error(
+      'Fehler beim Generieren von Maschinenmesswerten:',
+      axiosError.response?.data?.error || axiosError.message
+    );
+
+    message.value = axiosError.response?.data?.error || "Fehler bei der Maschinen-Messwert-Generierung!";
   }
 }
 
-onMounted(() => {
-  fetchFields()
-  fetchMachines()
+
+onMounted(async () => {
+  await fetchFields()
+  await fetchMachines()
 })
 </script>
