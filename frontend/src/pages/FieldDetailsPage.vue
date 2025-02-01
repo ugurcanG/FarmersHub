@@ -27,40 +27,13 @@
         </q-table>
       </q-card-section>
     </q-card>
+    <ChartContainer
+  :labels="labels"
+  :data="formattedData"
+  :chartOptions="chartOptions"
+  title="Messwerte-Analyse"
+/>
 
-    <!-- Diagramme -->
-    <q-card class="q-pa-md shadow-2 q-mt-md">
-      <q-card-section>
-        <h4 class="text-h6">Messwerte-Analyse</h4>
-        <q-separator class="q-mb-md" />
-        <div class="row q-col-gutter-md">
-          <div class="col-12 col-md-6">
-            <!-- Dropdown für Linendiagramm -->
-            <q-select
-              v-model="selectedLineData"
-              :options="chartOptions"
-              label="Linien-Daten auswählen"
-              outlined
-              dense
-              class="q-mb-md"
-            />
-            <canvas id="lineChart"></canvas>
-          </div>
-          <div class="col-12 col-md-6">
-            <!-- Dropdown für Balkendiagramm -->
-            <q-select
-              v-model="selectedBarData"
-              :options="chartOptions"
-              label="Balken-Daten auswählen"
-              outlined
-              dense
-              class="q-mb-md"
-            />
-            <canvas id="barChart"></canvas>
-          </div>
-        </div>
-      </q-card-section>
-    </q-card>
     <!-- Floating Button -->
     <q-btn
       v-if="!chatDrawerOpen"
@@ -113,31 +86,8 @@ import { ref, onMounted, watch, onBeforeUnmount, defineProps } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api } from 'boot/axios'
 import type { FieldMeasurement } from 'src/components/models';
-import {
-  Chart,
-  LineController,
-  BarController,
-  LineElement,
-  BarElement,
-  PointElement,
-  LinearScale,
-  CategoryScale,
-  Title,
-  Tooltip,
-} from 'chart.js'
+import ChartContainer from 'src/components/shared/ChartContainer.vue'
 
-// Registriere die notwendigen Chart.js-Komponenten
-Chart.register(
-  LineController,
-  BarController,
-  LineElement,
-  BarElement,
-  PointElement,
-  LinearScale,
-  CategoryScale,
-  Title,
-  Tooltip,
-)
 
 defineProps({
   id: {
@@ -254,22 +204,6 @@ const columns = [
   },
 ]
 
-// Dropdown-Optionen für Diagramme
-const chartOptions = [
-  { label: 'Temperatur (°C)', value: 'temperature' },
-  { label: 'Luftfeuchtigkeit (%)', value: 'humidity' },
-  { label: 'Bodenfeuchte (%)', value: 'soil_moisture' },
-  { label: 'Nährstoffe', value: 'nutrients_level' },
-  { label: 'Health Score', value: 'health_score' },
-]
-
-// Standardauswahl
-const selectedLineData = ref(chartOptions[0]) // Standard: Temperatur
-const selectedBarData = ref(chartOptions[4]) // Standard: Health Score
-
-let lineChart: Chart | null = null
-let barChart: Chart | null = null
-
 const route = useRoute()
 const router = useRouter()
 const fieldId = String(route.params.id)
@@ -289,90 +223,34 @@ const fetchMeasurements = async () => {
     const response = await api.get(`/fields/${fieldId}/measurements/`)
     fieldMeasurements.value = response.data
     console.log('Fetched Measurements:', fieldMeasurements.value) // Log die rohen Messwerte
-    renderCharts() // Initialisiere die Diagramme
   } catch (error) {
     console.error('Fehler beim Abrufen der Messwerte:', error)
   }
 }
 
-const renderCharts = () => {
-  const lineCanvas = document.getElementById('lineChart') as HTMLCanvasElement | null
-  const barCanvas = document.getElementById('barChart') as HTMLCanvasElement | null
+const labels = ref<string[]>([]);
+const formattedData = ref<{ [key: string]: number }[]>([]);
+const chartOptions = ref([
+  { label: 'Temperatur (°C)', value: 'temperature' },
+  { label: 'Luftfeuchtigkeit (%)', value: 'humidity' },
+  { label: 'Bodenfeuchte (%)', value: 'soil_moisture' },
+  { label: 'Nährstoffe', value: 'nutrients_level' },
+  { label: 'Health Score', value: 'health_score' },
+]);
 
-  const labels = fieldMeasurements.value.map((m) => new Date(m.created_at).toLocaleDateString())
+watch(fieldMeasurements, () => {
+  labels.value = fieldMeasurements.value.map((m) =>
+    new Date(m.created_at).toLocaleDateString()
+  );
 
-  const lineData = fieldMeasurements.value.map((m) => {
-    const key = selectedLineData.value?.value as keyof FieldMeasurement
-    if (!Object.keys(m).includes(key)) {
-      console.error(`Invalid key "${key}" for line chart`)
-      return 0
-    }
-    return (m[key] as number) || 0
-  })
-
-  const barData = fieldMeasurements.value.map((m) => {
-    const key = selectedBarData.value?.value as keyof FieldMeasurement
-    if (!Object.keys(m).includes(key)) {
-      console.error(`Invalid key "${key}" for bar chart`)
-      return 0
-    }
-    return (m[key] as number) || 0
-  })
-
-  console.log('Chart Labels:', labels)
-  console.log('Line Chart Data:', lineData)
-  console.log('Bar Chart Data:', barData)
-
-  if (lineCanvas) {
-    if (lineChart) lineChart.destroy()
-    lineChart = new Chart(lineCanvas.getContext('2d')!, {
-      type: 'line',
-      data: {
-        labels,
-        datasets: [
-          {
-            label: chartOptions.find((o) => o.value === selectedLineData.value?.value)?.label || '',
-            data: lineData,
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 2,
-            fill: false,
-          },
-        ],
-      },
-    })
-  }
-
-  if (barCanvas) {
-    if (barChart) barChart.destroy()
-    barChart = new Chart(barCanvas.getContext('2d')!, {
-      type: 'bar',
-      data: {
-        labels,
-        datasets: [
-          {
-            label: chartOptions.find((o) => o.value === selectedBarData.value?.value)?.label || '',
-            data: barData,
-            backgroundColor: 'rgba(153, 102, 255, 0.6)',
-            borderWidth: 1,
-          },
-        ],
-      },
-    })
-  }
-}
-
-// Watcher aktualisiert Diagramme bei Auswahländerung
-watch([selectedLineData, selectedBarData], () => {
-  console.log('Selected Line Data:', selectedLineData.value) // Debugging
-  console.log('Selected Bar Data:', selectedBarData.value) // Debugging
-  renderCharts()
-})
-
-// Cleanup bei Entladen der Komponente
-onBeforeUnmount(() => {
-  if (lineChart) lineChart.destroy()
-  if (barChart) barChart.destroy()
-})
+  formattedData.value = fieldMeasurements.value.map((m) => ({
+    temperature: m.temperature || 0,
+    humidity: m.humidity || 0,
+    soil_moisture: m.soil_moisture || 0,
+    nutrients_level: m.nutrients_level || 0,
+    health_score: m.health_score || 0,
+  }));
+});
 
 const goBack = async () => {
   await router.push('/fields')
@@ -402,33 +280,6 @@ onMounted(async () => {
   z-index: 10000;
 }
 
-/* Chat Drawer Styles */
-.chat-messages {
-  flex: 1; /* Nimmt den verbleibenden Platz ein */
-  overflow-y: auto; /* Ermöglicht Scrollen bei Bedarf */
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px; /* Abstand zwischen den Nachrichten */
-}
-
-.message {
-  padding: 12px 16px;
-  border-radius: 12px;
-  max-width: 75%;
-  word-wrap: break-word;
-}
-
-.message.left {
-  background-color: #f1f1f1;
-  align-self: flex-start;
-}
-
-.message.right {
-  background-color: #e0f7fa;
-  align-self: flex-end;
-  margin-left: auto;
-}
 .chat-input {
   position: sticky; /* Behält die Position relativ zum Drawer */
   bottom: 0; /* Am unteren Rand */
@@ -440,19 +291,6 @@ onMounted(async () => {
 
 .page-with-drawer {
   transition: margin-right 0.3s ease;
-}
-
-.drawer-style {
-  position: fixed; /* Ändere zu fixed, um den Drawer auf die Seite zu zwingen */
-  top: 0; /* Startet oben */
-  right: 0; /* An der rechten Seite */
-  height: 100vh; /* Deckt die gesamte Höhe ab */
-  width: 250px; /* Breite des Drawers */
-  background-color: #fff;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  z-index: 1100; /* Stelle sicher, dass der Drawer über dem Inhalt liegt */
 }
 
 .drawer-header {
