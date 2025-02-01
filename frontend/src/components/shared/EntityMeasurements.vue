@@ -1,19 +1,13 @@
 <template>
-  <q-card class="q-pa-md shadow-2">
-    <q-card-section>
-      <h4 class="text-h6">{{ title }}</h4>
-      <DataTable
-        :rows="measurements"
-        :columns="columns"
-        @refresh="fetchMeasurements"
-      />
-    </q-card-section>
-  </q-card>
+  <InfoCard :title="title">
+    <DataTable :rows="measurements" :columns="columns" @refresh="fetchMeasurements" />
+  </InfoCard>
 </template>
 
 <script setup lang="ts">
-import type { PropType } from 'vue';
+import InfoCard from 'src/components/shared/InfoCard.vue';
 import DataTable from 'src/components/shared/DataTable.vue';
+import type { PropType } from 'vue';
 
 defineProps({
   title: { type: String, default: 'Messwerte' },
@@ -22,7 +16,7 @@ defineProps({
     name: string;
     label: string;
     field: string | ((row: Record<string, unknown>) => unknown);
-    align?: 'left' | 'right' | 'center';
+    align?: "left" | "right" | "center";
     sortable?: boolean;
   }>>, required: true },
   fetchMeasurements: { type: Function as PropType<() => Promise<void>>, required: true },

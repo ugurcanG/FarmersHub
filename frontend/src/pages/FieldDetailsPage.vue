@@ -1,28 +1,32 @@
 <template>
   <q-page class="q-pa-md">
     <!-- Basisdetails -->
-    <q-card class="q-pa-md shadow-2">
-      <q-card-section>
-        <h3 class="text-h5 text-primary">Details für Feld: {{ field.name }}</h3>
-      </q-card-section>
-      <q-card-section>
-        <p><strong>Größe:</strong> {{ field.size }} ha</p>
-        <p><strong>Saatgut:</strong> {{ field.saat__name || 'Kein Saatgut zugewiesen' }}</p>
-        <p><strong>Erstellt am:</strong> {{ formatDateTime(field.created_at) }}</p>
-        <p><strong>Health Score:</strong> {{ field.health_score }}</p>
-      </q-card-section>
-      <q-card-actions align="right">
-        <q-btn flat label="Zurück" color="primary" @click="goBack" />
-      </q-card-actions>
-    </q-card>
+    <EntityDetails
+  title="Feld-Details"
+  :details="field"
+  :labels="{
+    name: 'Feldname',
+    size: 'Größe (ha)',
+    saat__name: 'Saatgut',
+    created_at: 'Erstellt am',
+    health_score: 'Health Score'
+  }"
+  :formatMap="{
+    created_at: formatDateTime
+  }"
+>
+  <template #actions>
+    <q-btn flat label="Zurück" color="primary" @click="goBack" />
+  </template>
+</EntityDetails>
 
-    <!-- Tabelle der Messwerte -->
-    <EntityMeasurements
-      title="Messwerte"
-      :measurements="fieldMeasurements"
-      :columns="columns"
-      :fetchMeasurements="fetchMeasurements"
-    />
+<!-- Messwerte -->
+<EntityMeasurements
+  title="Messwerte"
+  :measurements="fieldMeasurements"
+  :columns="columns"
+  :fetchMeasurements="fetchMeasurements"
+/>
 
     <!-- Diagramme -->
     <EntityCharts
@@ -44,6 +48,7 @@ import { api } from 'boot/axios';
 import type { FieldMeasurement } from 'src/components/models';
 import EntityMeasurements from 'src/components/shared/EntityMeasurements.vue';
 import EntityCharts from 'src/components/shared/EntityCharts.vue';
+import EntityDetails from 'src/components/shared/EntityDetails.vue';
 import ChatDrawer from 'src/components/shared/ChatDrawer.vue';
 import { formatDateTime } from 'src/utils/dateUtils';
 
@@ -60,7 +65,14 @@ const field = ref({
 
 const fieldMeasurements = ref<FieldMeasurement[]>([]);
   const columns = [
-  { name: 'created_at', label: 'Datum', field: 'created_at', align: 'left' as const, sortable: true, format: (val: string) => formatDateTime(val) },
+  {
+    name: 'created_at',
+    label: 'Datum',
+    field: 'created_at',
+    align: 'left' as const,
+    sortable: true,
+    format: (val: unknown) => (typeof val === 'string' ? formatDateTime(val) : 'Unbekannt')
+  },
   { name: 'temperature', label: 'Temperatur (°C)', field: 'temperature', align: 'left' as const, sortable: true },
   { name: 'humidity', label: 'Luftfeuchtigkeit (%)', field: 'humidity', align: 'left' as const, sortable: true },
   { name: 'soil_moisture', label: 'Bodenfeuchte (%)', field: 'soil_moisture', align: 'left' as const, sortable: true },
