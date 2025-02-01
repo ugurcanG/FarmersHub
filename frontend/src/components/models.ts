@@ -64,6 +64,11 @@ export interface Seed {
   pref_nutrient_level?: number | null;
 }
 
+export interface Link {
+  label: string
+  path: string
+}
+
 export interface ApiResponse<T> {
   data: T;
 }
