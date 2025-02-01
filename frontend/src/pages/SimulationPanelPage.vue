@@ -44,20 +44,7 @@
 import { ref, onMounted } from 'vue'
 import { api } from 'boot/axios'
 import type { AxiosError } from "axios";
-
-interface Field {
-  id: number;
-  name: string;
-}
-
-interface Machine {
-  id: number
-  name: string
-}
-
-interface ApiResponse<T> {
-  data: T
-}
+import type { Field, Machine, ApiResponse } from 'src/components/models';
 
 const selectedField = ref<{ label: string, value: number } | null>(null)
 const selectedMachine = ref<{ label: string, value: number } | null>(null)

@@ -18,7 +18,7 @@
             <div class="content-container">
               <p>Größe: {{ field.size }} ha</p>
               <p class="saat-info">
-                Saatgut: <span>{{ field.saat__name || 'Kein Saatgut zugewiesen' }}</span>
+                Saatgut: <span>{{ field.saat_name || 'Kein Saatgut zugewiesen' }}</span>
               </p>
             </div>
           </template>
@@ -46,10 +46,10 @@
           <template #image>
             <div
               :class="{
-                'bg-green-7': field.health_score !== null && field.health_score >= 3,
+                'bg-green-7': field.health_score != null && field.health_score >= 3,
                 'bg-orange-5':
-                  field.health_score !== null && field.health_score >= 2 && field.health_score < 3,
-                'bg-red-5': field.health_score !== null && field.health_score < 2,
+                  field.health_score != null && field.health_score >= 2 && field.health_score < 3,
+                'bg-red-5': field.health_score != null && field.health_score < 2,
               }"
               style="width: 100px; height: 100px; transform: rotate(15deg); border: 1px"
             ></div>
@@ -112,18 +112,7 @@ import { api } from 'boot/axios'
 import Card from 'src/components/BaseCard.vue'
 import Button from 'src/components/BaseButton.vue'
 import FieldModal from 'src/components/modals/FieldModal.vue'
-
-interface Field {
-  id: number
-  name: string // Name des Feldes
-  size: number // Größe des Feldes
-  created_at: string
-  saat__name: string | null // Name des Saatguts (falls vorhanden)
-  width: number
-  height: number
-  saat_name: string
-  health_score: number | null
-}
+import type { Field } from 'src/components/models';
 
 const fields = ref<Field[]>([])
 const showAddFieldModal = ref(false)

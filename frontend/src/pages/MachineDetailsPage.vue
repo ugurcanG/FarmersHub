@@ -13,7 +13,7 @@
         <p><strong>Betriebsstunden:</strong> {{ machine.operating_hours ?? 0 }} h</p>
         <p><strong>Zugewiesenes Feld:</strong> {{ machine.assigned_field?.name ?? 'Kein Feld zugewiesen' }}</p>
         <p><strong>Mitarbeiter:</strong>
-          <span v-if="machine.assigned_employees.length > 0">
+          <span v-if="machine.assigned_employees && machine.assigned_employees.length > 0">
             {{ machine.assigned_employees.map(e => `${e.first_name} ${e.last_name}`).join(', ') }}
           </span>
           <span v-else>Keine Mitarbeiter zugewiesen</span>
@@ -74,6 +74,7 @@
 import { ref, onMounted, watch, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api } from 'boot/axios'
+import type { Machine, MachineMeasurement } from 'src/components/models';
 import {
   Chart,
   LineController,
@@ -90,39 +91,6 @@ import {
 // Registriere Chart.js-Komponenten
 Chart.register(LineController, BarController, LineElement, BarElement, PointElement, LinearScale, CategoryScale, Title, Tooltip)
 
-// Typen für Maschinen und Messwerte
-interface Employee {
-  id: number
-  first_name: string
-  last_name: string
-}
-
-interface Field {
-  id: number
-  name: string
-}
-
-interface Machine {
-  id: number
-  name: string
-  status: string
-  category: string
-  serial_number: string | null
-  year_of_manufacture: number | null
-  operating_hours: number
-  assigned_field: Field | null
-  assigned_employees: Employee[]
-}
-
-interface MachineMeasurement {
-  id: number
-  recorded_at: string
-  fuel_level: number | null
-  engine_temperature: number | null
-  oil_level: number | null
-  rpm: number | null
-}
-
 // Routen-Setup
 const route = useRoute()
 const router = useRouter()
@@ -134,8 +102,8 @@ const machine = ref<Machine>({
   name: '',
   status: '',
   category: '',
-  serial_number: null,
-  year_of_manufacture: null,
+  serial_number: "",
+  year_of_manufacture: 0,
   operating_hours: 0,
   assigned_field: null,
   assigned_employees: []

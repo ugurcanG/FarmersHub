@@ -99,11 +99,7 @@ import { api } from 'boot/axios'
 import EmployeeModal from 'src/components/modals/EmployeeModal.vue'
 import MachineAssignmentModal from 'src/components/modals/MachineAssignmentModal.vue'
 import FieldAssignmentModal from 'src/components/modals/FieldAssignmentModal.vue'
-
-interface Field {
-  id: number
-  name: string
-}
+import type { Field, Machine, Employee } from 'src/components/models';
 
 const showFieldModal = ref(false)
 const fieldOptions = ref<Field[]>([])
@@ -123,23 +119,6 @@ const fetchFields = async () => {
 const openFieldModal = (employee: Employee) => {
   selectedEmployeeForField.value = employee
   showFieldModal.value = true
-}
-
-interface Machine {
-  id: number
-  name: string
-  status: string
-  category: string
-  operating_hours: number
-}
-
-interface Employee {
-  id: number
-  first_name: string
-  last_name: string
-  role: string
-  assigned_machines?: Machine[]
-  assigned_field?: { id: number; name: string }
 }
 
 const employees = ref<Employee[]>([])

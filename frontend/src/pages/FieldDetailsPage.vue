@@ -20,7 +20,7 @@
     <q-card class="q-pa-md shadow-2 q-mt-md">
       <q-card-section>
         <h4 class="text-h6">Messwerte</h4>
-        <q-table :rows="measurements" :columns="columns" row-key="id" flat bordered>
+        <q-table :rows="fieldMeasurements" :columns="columns" row-key="id" flat bordered>
           <template v-slot:top-right>
             <q-btn flat icon="refresh" @click="fetchMeasurements" label="Aktualisieren" />
           </template>
@@ -112,6 +112,7 @@
 import { ref, onMounted, watch, onBeforeUnmount, defineProps } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api } from 'boot/axios'
+import type { FieldMeasurement } from 'src/components/models';
 import {
   Chart,
   LineController,
@@ -207,17 +208,7 @@ const field = ref({
   health_score: null,
 })
 
-interface Measurement {
-  id: number
-  created_at: string
-  temperature: number
-  humidity: number
-  soil_moisture: number
-  nutrients_level: number
-  health_score: number
-}
-
-const measurements = ref<Measurement[]>([])
+const fieldMeasurements = ref<FieldMeasurement[]>([])
 const columns = [
   {
     name: 'created_at',
@@ -296,8 +287,8 @@ const fetchFieldDetails = async () => {
 const fetchMeasurements = async () => {
   try {
     const response = await api.get(`/fields/${fieldId}/measurements/`)
-    measurements.value = response.data
-    console.log('Fetched Measurements:', measurements.value) // Log die rohen Messwerte
+    fieldMeasurements.value = response.data
+    console.log('Fetched Measurements:', fieldMeasurements.value) // Log die rohen Messwerte
     renderCharts() // Initialisiere die Diagramme
   } catch (error) {
     console.error('Fehler beim Abrufen der Messwerte:', error)
@@ -308,10 +299,10 @@ const renderCharts = () => {
   const lineCanvas = document.getElementById('lineChart') as HTMLCanvasElement | null
   const barCanvas = document.getElementById('barChart') as HTMLCanvasElement | null
 
-  const labels = measurements.value.map((m) => new Date(m.created_at).toLocaleDateString())
+  const labels = fieldMeasurements.value.map((m) => new Date(m.created_at).toLocaleDateString())
 
-  const lineData = measurements.value.map((m) => {
-    const key = selectedLineData.value?.value as keyof Measurement
+  const lineData = fieldMeasurements.value.map((m) => {
+    const key = selectedLineData.value?.value as keyof FieldMeasurement
     if (!Object.keys(m).includes(key)) {
       console.error(`Invalid key "${key}" for line chart`)
       return 0
@@ -319,8 +310,8 @@ const renderCharts = () => {
     return (m[key] as number) || 0
   })
 
-  const barData = measurements.value.map((m) => {
-    const key = selectedBarData.value?.value as keyof Measurement
+  const barData = fieldMeasurements.value.map((m) => {
+    const key = selectedBarData.value?.value as keyof FieldMeasurement
     if (!Object.keys(m).includes(key)) {
       console.error(`Invalid key "${key}" for bar chart`)
       return 0

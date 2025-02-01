@@ -100,16 +100,7 @@ import { api } from 'boot/axios'
 import Card from 'src/components/BaseCard.vue'
 import Button from 'src/components/BaseButton.vue'
 import MachineModal from 'src/components/modals/MachineModal.vue'
-
-interface Machine {
-  id: number
-  name: string
-  status: string
-  category: string
-  image_url: string
-  serial_number: string
-  year_of_manufacture: number
-}
+import type { Machine } from 'src/components/models';
 
 const machines = ref<Machine[]>([])
 const showAddMachineModal = ref(false)
@@ -136,9 +127,13 @@ const fetchMachines = async () => {
 
 // Maschine bearbeiten
 const editMachine = (index: number) => {
-  machineToEdit.value = machines.value[index] || null
-  showEditMachineModal.value = true
-}
+  machineToEdit.value = {
+    ...machines.value[index],
+    year_of_manufacture: machines.value[index].year_of_manufacture ?? 0, // Falls `undefined`, setze 0
+  };
+  showEditMachineModal.value = true;
+};
+
 
 // Modal schließen
 const closeEditModal = () => {

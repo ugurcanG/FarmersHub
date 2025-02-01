@@ -33,15 +33,7 @@
 <script setup lang="ts">
 import { ref, defineProps, defineEmits, watch } from 'vue'
 import { api } from 'boot/axios'
-
-interface Machine {
-  id: number
-  name: string
-  status: string
-  category: string
-  operating_hours: number
-  image_url?: string
-}
+import type { Machine } from 'src/components/models';
 
 const props = defineProps({
   modelValue: Boolean,

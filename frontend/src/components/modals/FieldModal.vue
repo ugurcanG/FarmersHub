@@ -38,6 +38,7 @@
 import { ref, defineEmits, defineProps, computed, watch, onMounted } from 'vue'
 import { api } from 'boot/axios'
 import type { PropType } from 'vue'
+import type { Field } from 'src/components/models';
 
 const emit = defineEmits(['close', 'submit'])
 const props = defineProps({
@@ -55,19 +56,12 @@ const localShowModal = computed({
   },
 })
 
-// Typ für die Felddaten
-interface FieldData {
-  name: string
-  width: number | null
-  height: number | null
-  saat_name: string | null
-}
-
-const fieldData = ref<FieldData>({
+const fieldData = ref<Field>({
+  id: 0,
   name: '',
-  width: null,
-  height: null,
-  saat_name: null,
+  width: 0,
+  height: 0,
+  saat_name: '',
 })
 
 // Liste der verfügbaren Samen für die Auswahl
@@ -91,9 +85,9 @@ watch(
   () => props.fieldToEdit,
   (newField) => {
     if (newField) {
-      fieldData.value = { ...newField }
+      fieldData.value = { id: fieldData.value.id, ...newField }
     } else {
-      fieldData.value = { name: '', width: null, height: null, saat_name: null }
+      fieldData.value = { id: 0, name: '', width: 0, height: 0, saat_name: '' }
     }
   },
   { immediate: true },
