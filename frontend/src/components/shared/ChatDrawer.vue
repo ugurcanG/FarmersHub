@@ -49,57 +49,63 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineEmits, watch, nextTick } from 'vue';
-import { api } from 'boot/axios';
+import { ref, defineProps, defineEmits, watch, nextTick } from 'vue'
+import { api } from 'boot/axios'
 
 const props = defineProps({
   chatDrawerOpen: Boolean,
   title: { type: String, default: 'Chat mit GPT' },
-});
+})
 
-const emit = defineEmits(['update:chatDrawerOpen']);
-const localChatDrawerOpen = ref(props.chatDrawerOpen);
+const emit = defineEmits(['update:chatDrawerOpen'])
+const localChatDrawerOpen = ref(props.chatDrawerOpen)
 
-watch(() => props.chatDrawerOpen, (newValue) => {
-  localChatDrawerOpen.value = newValue;
-});
+watch(
+  () => props.chatDrawerOpen,
+  (newValue) => {
+    localChatDrawerOpen.value = newValue
+  },
+)
 
 const toggleChat = () => {
-  localChatDrawerOpen.value = !localChatDrawerOpen.value;
-  emit('update:chatDrawerOpen', localChatDrawerOpen.value);
-};
+  localChatDrawerOpen.value = !localChatDrawerOpen.value
+  emit('update:chatDrawerOpen', localChatDrawerOpen.value)
+}
 
-const chatMessages = ref([{ role: 'gpt', text: 'Willkommen! Wie kann ich dir helfen?' }]);
-const userMessage = ref('');
-const chatBox = ref<HTMLElement | null>(null);
+const chatMessages = ref([{ role: 'gpt', text: 'Willkommen! Wie kann ich dir helfen?' }])
+const userMessage = ref('')
+const chatBox = ref<HTMLElement | null>(null)
 
 const sendMessage = async () => {
-  if (!userMessage.value.trim()) return;
+  if (!userMessage.value.trim()) return
 
-  chatMessages.value.push({ role: 'user', text: userMessage.value });
-  const userInput = userMessage.value;
-  userMessage.value = '';
+  chatMessages.value.push({ role: 'user', text: userMessage.value })
+  const userInput = userMessage.value
+  userMessage.value = ''
 
-  chatMessages.value.push({ role: 'gpt', text: 'GPT schreibt...' });
-  await scrollToBottom();
+  chatMessages.value.push({ role: 'gpt', text: 'GPT schreibt...' })
+  await scrollToBottom()
 
   try {
-    const response = await api.post('/chat/', { message: userInput, system_message: 'Bitte antworte immer auf Deutsch.' });
-    chatMessages.value.pop();
-    chatMessages.value.push({ role: 'gpt', text: response.data.reply });
-    await scrollToBottom();
+    const response = await api.post('/chat/', {
+      message: userInput,
+      system_message: 'Bitte antworte immer auf Deutsch.',
+    })
+    chatMessages.value.pop()
+    chatMessages.value.push({ role: 'gpt', text: response.data.reply })
+    await scrollToBottom()
   } catch (error) {
-    console.error('Fehler beim Abrufen der GPT-Antwort:', error);
-    chatMessages.value.pop();
-    chatMessages.value.push({ role: 'gpt', text: 'Entschuldigung, etwas ist schiefgelaufen.' });
-    await scrollToBottom();
+    console.error('Fehler beim Abrufen der GPT-Antwort:', error)
+    chatMessages.value.pop()
+    chatMessages.value.push({ role: 'gpt', text: 'Entschuldigung, etwas ist schiefgelaufen.' })
+    await scrollToBottom()
   }
-};
+}
 
 const scrollToBottom = async () => {
-  await nextTick();
-  if (chatBox.value) chatBox.value.scrollTop = chatBox.value.scrollHeight;
-};
+  await nextTick()
+  if (chatBox.value) chatBox.value.scrollTop = chatBox.value.scrollHeight
+}
 </script>
 
 <style scoped>

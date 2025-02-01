@@ -10,14 +10,14 @@
 </template>
 
 <script setup lang="ts">
-import ChartContainer from 'src/components/shared/ChartContainer.vue';
+import ChartContainer from 'src/components/shared/ChartContainer.vue'
 
 defineProps<{
-  title: string;
-  labels: string[];
-  formattedData: { [key: string]: number }[];
-  chartOptions: { label: string; value: string }[];
-}>();
+  title: string
+  labels: string[]
+  formattedData: { [key: string]: number }[]
+  chartOptions: { label: string; value: string }[]
+}>()
 </script>
 
 <style scoped>
