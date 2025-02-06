@@ -38,14 +38,14 @@ import ChatDrawer from 'src/components/shared/ChatDrawer.vue'
 import SeedModal from 'src/components/modals/SeedModal.vue'
 import type { Seed } from 'src/components/models'
 
-// 🌱 State-Variablen
+//  State-Variablen
 const chatDrawerOpen = ref(false)
 const seeds = ref<Seed[]>([])
 
 const isSeedDialogOpen = ref(false)
 const selectedSeed = ref<Seed | null>(null)
 
-// 📊 Tabellen-Spalten mit Aktionsspalte
+//  Tabellen-Spalten mit Aktionsspalte
 const columns = [
   { name: 'name', label: 'Saatgutname', field: 'name', align: 'left' as const },
   { name: 'mass_kg', label: 'Masse (kg)', field: 'mass_kg', align: 'left' as const },
@@ -56,7 +56,7 @@ const columns = [
   { name: 'actions', label: 'Aktionen', align: 'center' as const, field: 'actions' },
 ]
 
-// 🌍 Saatgut abrufen
+// Saatgut abrufen
 const fetchSeeds = async () => {
   try {
     const response = await api.get('/seeds/')
@@ -66,13 +66,13 @@ const fetchSeeds = async () => {
   }
 }
 
-// ➕ Neues/Bearbeitetes Saatgut speichern
+//  Neues/Bearbeitetes Saatgut speichern
 const openSeedDialog = (seed: Seed | null = null) => {
   selectedSeed.value = seed ? { ...seed } : null // Wenn kein Seed übergeben wird, bedeutet das "Neues Saatgut"
   isSeedDialogOpen.value = true
 }
 
-// 📩 Saatgut speichern (Neu oder Update)
+// Saatgut speichern (Neu oder Update)
 const handleSeedSubmit = async (seed: Seed) => {
   try {
     if (selectedSeed.value?.id) {
@@ -87,7 +87,7 @@ const handleSeedSubmit = async (seed: Seed) => {
   }
 }
 
-// ❌ Saatgut löschen
+//  Saatgut löschen
 const deleteSeed = async (seedId: number) => {
   if (!confirm('Möchtest du dieses Saatgut wirklich löschen?')) return
   try {

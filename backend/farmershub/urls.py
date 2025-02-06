@@ -22,6 +22,7 @@ from .views.seeds import get_seeds, add_seed, delete_seed, update_seed
 from .views.employees import get_employees, add_employee, update_employee, delete_employee, assign_employee_to_field, get_employees_by_field
 from .views.simulation import generate_field_measurements, generate_machine_measurements
 from .views.chatgpt import chat_with_gpt
+from .views.market import get_market_data
 
 
 
@@ -75,4 +76,6 @@ urlpatterns = [
     path('simulation/generate_field_measurements/', generate_field_measurements, name='generate_field_measurements'),
     path('simulation/generate_machine_measurements/', generate_machine_measurements, name='generate_machine_measurements'),
 
+    # Marktdaten-URLs
+    path("market/", get_market_data, name="get_market_data"),
 ]

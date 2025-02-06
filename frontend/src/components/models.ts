@@ -9,6 +9,18 @@ export interface Field {
   health_score?: number | null
 }
 
+export interface MarketData {
+  seed_prices: Record<string, number>
+  harvest_prices: Record<string, number>
+  expenses: {
+    fields: number
+    employees: number
+    machines: number
+  }
+  total_revenue: number
+  profit_loss: number
+}
+
 export interface Machine {
   id: number
   name: string

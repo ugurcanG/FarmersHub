@@ -94,6 +94,8 @@
         </q-card-actions>
       </q-card>
     </q-dialog>
+        <!-- ChatDrawer für GPT Chat -->
+        <ChatDrawer v-model:chatDrawerOpen="chatDrawerOpen" />
   </q-page>
 </template>
 
@@ -104,6 +106,7 @@ import Card from 'src/components/BaseCard.vue'
 import Button from 'src/components/BaseButton.vue'
 import MachineModal from 'src/components/modals/MachineModal.vue'
 import type { Machine } from 'src/components/models'
+import ChatDrawer from 'src/components/shared/ChatDrawer.vue'
 
 const machines = ref<Machine[]>([])
 const showAddMachineModal = ref(false)
@@ -112,6 +115,7 @@ const showDeleteDialog = ref(false)
 const selectedMachineIndex = ref<number | null>(null)
 const machineToEdit = ref<Machine | null>(null)
 const menuState = ref<boolean[]>([])
+const chatDrawerOpen = ref(false)
 
 const toggleMenu = (index: number) => {
   menuState.value = machines.value.map((_, i) => (i === index ? !menuState.value[index] : false))
