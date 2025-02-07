@@ -60,7 +60,12 @@ export default defineConfig((ctx) => {
       // polyfillModulePreload: true,
       // distDir
 
-      // extendViteConf (viteConf) {},
+      extendViteConf (viteConf) {
+        if (!viteConf.server) {
+          viteConf.server = {};
+        }
+        viteConf.server.allowedHosts = ['farmershub.guerkanwurst.de'];
+      },
       // viteVuePluginOptions: {},
       vitePlugins: [
         [
